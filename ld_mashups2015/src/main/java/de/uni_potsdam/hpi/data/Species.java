@@ -10,7 +10,7 @@ public class Species {
     /** Holds the scientific Name of the species */
     private String scientificName;
     private String thumbnailURL;
-    private String abstractDescription;
+    private String Description;
 
     public String getScientificName() {
         return scientificName;
@@ -28,11 +28,11 @@ public class Species {
         this.thumbnailURL = thumbnailURL;
     }
 
-    public String getAbstractDescription() {
-        return abstractDescription;
+    public String getDescription() {
+        return Description;
     }
 
-    public void setAbstractDescription(String abstractDescription) {
-        this.abstractDescription = abstractDescription;
+    public void setDescription(String Description) {
+        this.Description = Description;
     }
 }

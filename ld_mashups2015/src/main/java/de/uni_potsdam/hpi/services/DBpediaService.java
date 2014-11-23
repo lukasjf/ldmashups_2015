@@ -12,11 +12,12 @@ public class DBpediaService {
 	
     // searching for strings does not work yet, nor does it in the online endpoint
 	public void includeDataFromDBpedia(Species species){
+	    System.out.println(species.getScientificName());
 		String sparqlQueryString= 
 	        "SELECT ?image ?abstract " +
 	        "FROM <http://dbpedia.org> " + 
 	        "WHERE { " + 
-	        "?animal <http://dbpedia.org/property/binomial> \"Alcedo atthis\" . " + 
+	        "?animal <http://dbpedia.org/property/binomial> \""+ species.getScientificName() +"\"@en . " + 
 	        "?animal <http://dbpedia.org/ontology/thumbnail> ?image . " +
             "?animal <http://dbpedia.org/ontology/abstract> ?abstract . " +
             "FILTER (LANG(?abstract) = \"en\")" + 
@@ -29,9 +30,8 @@ public class DBpediaService {
             QuerySolution answer = results.next();
             System.out.println(answer.getLiteral("abstract")); // instead assigning it to the species
             System.out.println(answer.getResource("image").toString()); //assign to animal
+            species.setDescription(answer.getLiteral("abstract").toString());
+            species.setThumbnailURL(answer.getResource("image").toString());
         }
      }
-	public static void main (String[] args){
-	    new DBpediaService().includeDataFromDBpedia(null); 
-	}
 }
