@@ -33,6 +33,7 @@ public class GbifService {
             occurrenceClient.setRequestMethod("GET");
             int responseCode = occurrenceClient.getResponseCode();
             System.out.println("Response Code : " + responseCode);
+            occurrenceClient.disconnect();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -45,7 +46,6 @@ public class GbifService {
     }
 
     public Species getSpeciesByLocation(double latitude, double longitude) {
-        locationIsValid(latitude, latitude, longitude, longitude);
         if (!locationIsValid(latitude, latitude, longitude, longitude)) {
             System.err.println("Invalid Location");
             return null;
