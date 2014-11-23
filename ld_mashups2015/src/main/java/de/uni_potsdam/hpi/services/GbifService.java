@@ -13,7 +13,6 @@ import java.net.URL;
  * @author Stephan
  * @version 14/11/11
  */
-@Path("/occurrence")
 public class GbifService {
     /** URL (String) to the occurrence API of the gbif */
     String occurenceApiString = "http://api.gbif.org/v1/occurrence/";

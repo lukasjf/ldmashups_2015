@@ -12,6 +12,12 @@
             <artifactId>jersey-grizzly</artifactId>
             <version>${jersey-version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>apache-jena-libs</artifactId>
+            <type>pom</type>
+            <version>2.12.1</version>
+        </dependency>
         <!-- uncomment this to get JSON support:
          <dependency>
             <groupId>com.sun.jersey</groupId>
