@@ -1,5 +1,8 @@
 package de.uni_potsdam.hpi.data;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * Holds all the informations about a species
  *
@@ -11,6 +14,8 @@ public class Species {
     private String scientificName;
     private String thumbnailURL;
     private String Description;
+    private List<String> equivalentWebpages;
+    private List<String> imageUrls;
 
     public String getScientificName() {
         return scientificName;
@@ -34,5 +39,27 @@ public class Species {
 
     public void setDescription(String Description) {
         this.Description = Description;
+    }
+
+    public List<String> getEquivalentWebpages() {
+        if (null == imageUrls) {
+            return new LinkedList<String>();
+        }
+        return equivalentWebpages;
+    }
+
+    public void setEquivalentWebpages(List<String> equivalentWebpages) {
+        this.equivalentWebpages = equivalentWebpages;
+    }
+
+    public List<String> getImageUrls() {
+        if (null == imageUrls) {
+            return new LinkedList<String>();
+        }
+        return imageUrls;
+    }
+
+    public void setImageUrls(List<String> imageUrls) {
+        this.imageUrls = imageUrls;
     }
 }

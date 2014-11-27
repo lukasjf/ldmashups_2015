@@ -1,5 +1,6 @@
 package de.uni_potsdam.hpi.services;
 
+import de.uni_potsdam.hpi.data.Species;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -45,10 +46,10 @@ public class FreebaseService {
 
     public List<String> findImageUrlsByName(String name) {
         String mid = findMidByName(name);
-        return findImageUrlsMid(mid);
+        return findImageUrlsByMid(mid);
     }
 
-    private List<String> findImageUrlsMid(String mid) {
+    private List<String> findImageUrlsByMid(String mid) {
         if (null == mid) {
             return null;
         }
@@ -60,7 +61,7 @@ public class FreebaseService {
             List<String> imageUrls = new LinkedList<String>();
             for (int i = 0; i < images.length(); i++) {
                 imageUrls.add("https://www.googleapis.com/freebase/v1/image" + images.getJSONObject(i).getString("id") +
-                        "?maxwidth=960");
+                        "?maxwidth=480");
             }
             return imageUrls;
         } catch (Exception e) {
@@ -121,4 +122,9 @@ public class FreebaseService {
     }
 
 
+    public void includeDataFromFreebase(Species species) {
+        String mid = findMidByName(species.getScientificName());
+        species.setEquivalentWebpages(findEquivalentWebPagesByMid(mid));
+        species.setImageUrls(findImageUrlsByMid(mid));
+    }
 }

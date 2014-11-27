@@ -11,7 +11,8 @@ public class DBpediaServiceTest{
 
     Species parusMajor;
     
-    @Before public void initializeParusMajor(){
+    @Before
+    public void initializeParusMajor(){
         parusMajor = new Species();
         parusMajor.setScientificName("Parus major");
     }
@@ -20,5 +21,10 @@ public class DBpediaServiceTest{
         new DBpediaService().includeDataFromDBpedia(parusMajor);
         assertNotNull("could not extract Thumbnail", parusMajor.getThumbnailURL());
         assertNotNull("could not extract Descritpion", parusMajor.getDescription());
+    }
+    @Test
+    public void testAbstractSpeciesName() {
+        new DBpediaService().includeDataFromDBpedia(parusMajor);
+        assertTrue("did extract wrong information", parusMajor.getDescription().toLowerCase().contains("great tit"));
     }
 }

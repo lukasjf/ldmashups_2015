@@ -1,10 +1,10 @@
 package de.uni_potsdam.hpi.services;
 
 import de.uni_potsdam.hpi.data.Species;
+import org.json.JSONObject;
 
 import javax.ws.rs.Path;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -21,6 +21,7 @@ public class GbifService {
     }
 
     public Species getSpeciesByLocation(double latitude1, double latitude2, double longitude1, double longitude2) {
+        Species result = null;
         if (!locationIsValid(latitude1, latitude2, longitude1, longitude2)) {
             System.err.println("Invalid Location");
             return null;
@@ -33,11 +34,15 @@ public class GbifService {
             occurrenceClient.setRequestMethod("GET");
             int responseCode = occurrenceClient.getResponseCode();
             System.out.println("Response Code : " + responseCode);
+            JSONObject response = getResponse(occurrenceClient);
+            JSONObject firstSpecies = response.getJSONArray("results").getJSONObject(0);
+            result = new Species();
             occurrenceClient.disconnect();
+            result.setScientificName(firstSpecies.getString("species"));
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return result;
     }
 
     private boolean locationIsValid(double latitude1, double latitude2, double longitude1, double longitude2) {
@@ -46,6 +51,7 @@ public class GbifService {
     }
 
     public Species getSpeciesByLocation(double latitude, double longitude) {
+        Species result = null;
         if (!locationIsValid(latitude, latitude, longitude, longitude)) {
             System.err.println("Invalid Location");
             return null;
@@ -58,9 +64,27 @@ public class GbifService {
             occurrenceClient.setRequestMethod("GET");
             int responseCode = occurrenceClient.getResponseCode();
             System.out.println("Response Code : " + responseCode);
+            JSONObject response = getResponse(occurrenceClient);
+            JSONObject firstSpecies = response.getJSONArray("results").getJSONObject(0);
+            result = new Species();
+            result.setScientificName(firstSpecies.getString("species"));
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return result;
+    }
+
+
+    private JSONObject getResponse(HttpURLConnection mqlClient) throws IOException {
+        InputStream is = mqlClient.getInputStream();
+        BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+        String line;
+        StringBuilder response = new StringBuilder();
+        while((line = rd.readLine()) != null) {
+            response.append(line);
+            response.append('\r');
+        }
+        rd.close();
+        return new JSONObject(response.toString());
     }
 }

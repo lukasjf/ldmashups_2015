@@ -22,9 +22,9 @@ public class GbifTest{
     @Test
     public void testSpeciesScientificName() {
         GbifService gbif = new GbifService();
-        Species species = gbif.getSpeciesByLocation(12.0, 13.0, 51.0, 52.0);
+        Species species = gbif.getSpeciesByLocation(51.0, 53.0, 12.0, 15.0);
         assertNotNull("species was null", species);
-        assertNotNull(species.getScientificName(),"scientificName was not set");
+        assertNotNull("scientificName was not set", species.getScientificName());
     }
 
     /**
@@ -33,9 +33,9 @@ public class GbifTest{
     @Test
     public void testLocationIsValid() {
         GbifService gbif = new GbifService();
-        assertEquals(null, gbif.getSpeciesByLocation(-181, 0),"allows too low latitude");
-        assertEquals(null, gbif.getSpeciesByLocation(181, 0),"allows too high latitude");
-        assertEquals(null, gbif.getSpeciesByLocation(0, 90),"allows too low longitude");
-        assertEquals(null, gbif.getSpeciesByLocation(0, -90),"allows too high longitude");
+        assertEquals("allows too low latitude", gbif.getSpeciesByLocation(0, -181), null);
+        assertEquals("allows too high latitude", gbif.getSpeciesByLocation(0, 181), null);
+        assertEquals("allows too low longitude", gbif.getSpeciesByLocation(91, 0), null);
+        assertEquals("allows too high longitude", gbif.getSpeciesByLocation(-91, 0), null);
     }
 }
