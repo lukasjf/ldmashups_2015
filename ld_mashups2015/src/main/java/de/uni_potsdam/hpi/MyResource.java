@@ -30,6 +30,7 @@ public class MyResource {
         FreebaseService fs = new FreebaseService();
         fs.includeDataFromFreebase(species);
         StringBuilder sb = new StringBuilder();
+        species.encodeSpeciesInRDF();
         for (String url : species.getImageUrls()) {
             sb.append("<img src=\"" + url + "\"/>");
 

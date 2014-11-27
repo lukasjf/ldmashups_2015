@@ -3,6 +3,12 @@ package de.uni_potsdam.hpi.data;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
+
 /**
  * Holds all the informations about a species
  *
@@ -61,5 +67,42 @@ public class Species {
 
     public void setImageUrls(List<String> imageUrls) {
         this.imageUrls = imageUrls;
+    }
+    
+    public void encodeSpeciesInRDF(){
+        Model model = ModelFactory.createDefaultModel();
+        Resource resource = model.createResource("");
+        addNamePropertiesToSpecies(resource);
+        addIdentificationToSpecies(resource);
+        addMediaToSpecies(resource);
+        addTaxonToSpecies(resource);
+        addDescriptionToSpecies(resource);
+        model.write(System.out, "N-Triples");
+    }
+
+    private void addTaxonToSpecies(Resource resource) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    private void addMediaToSpecies(Resource resource) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    private void addIdentificationToSpecies(Resource resource) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    private void addNamePropertiesToSpecies(Resource resource) {
+        resource.addProperty(
+                ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/binomial"), getScientificName());
+        resource.addProperty(
+                ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/scientificName"), getScientificName());
+    }
+
+    private void addDescriptionToSpecies(Resource resource) {
+        
     }
 }
