@@ -3,11 +3,7 @@ package de.uni_potsdam.hpi.data;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.rdf.model.*;
 
 /**
  * Holds all the informations about a species
@@ -22,6 +18,16 @@ public class Species {
     private String Description;
     private List<String> equivalentWebpages;
     private List<String> imageUrls;
+
+    public String getEntityURI() {
+        return entityURI;
+    }
+
+    public void setEntityURI(String entityURI) {
+        this.entityURI = entityURI;
+    }
+
+    private String entityURI;
 
     public String getScientificName() {
         return scientificName;
@@ -71,7 +77,7 @@ public class Species {
     
     public void encodeSpeciesInRDF(){
         Model model = ModelFactory.createDefaultModel();
-        Resource resource = model.createResource("");
+        Resource resource = model.createResource(getEntityURI());
         addNamePropertiesToSpecies(resource);
         addIdentificationToSpecies(resource);
         addMediaToSpecies(resource);
@@ -81,12 +87,18 @@ public class Species {
     }
 
     private void addTaxonToSpecies(Resource resource) {
-        // TODO Auto-generated method stub
+        resource.addProperty(
+                ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/binomial"), getScientificName());
         
     }
 
     private void addMediaToSpecies(Resource resource) {
-        // TODO Auto-generated method stub
+        if (getThumbnailURL() != null) {
+            resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/associatedMedia"), ResourceFactory.createResource(getThumbnailURL()));
+        }
+        for (String url : getImageUrls()) {
+            resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/associatedMedia"), ResourceFactory.createResource(url));
+        }
         
     }
 

@@ -16,25 +16,28 @@ import javax.ws.rs.QueryParam;
 public class Occurrence {
 
     // TODO: update the class to suit your needs
-    
+
     // The Java method will process HTTP GET requests
-    @GET 
+    @GET
     // The Java method will produce content identified by the MIME Media
-    // type "text/plain"
+    // type "text/html"
     @Produces("text/html")
     public String getIt(@QueryParam("longitude") double longitude, @QueryParam("latitude") double latitude) {
         GbifService gbif = new GbifService();
         DBpediaService db = new DBpediaService();
         Species species = gbif.getSpeciesByLocation(latitude, longitude);
-        /*db.includeDataFromDBpedia(species);*/
+        db.includeDataFromDBpedia(species);
         FreebaseService fs = new FreebaseService();
         fs.includeDataFromFreebase(species);
         StringBuilder sb = new StringBuilder();
+        species.encodeSpeciesInRDF();
+        sb.append("<p>");
         for (String url : species.getImageUrls()) {
             sb.append("<img src=\"" + url + "\"/>");
 
         }
-        sb.append("See also:");
+        sb.append("</p>");
+        sb.append("<h2>See also:</h2>");
         for (String url : species.getEquivalentWebpages()) {
             sb.append("<p><a href=\""+ url +"\">"+ url +"</a></p>");
         }
@@ -45,16 +48,20 @@ public class Occurrence {
                 "    <title>Occurence</title>\n" +
                 "</head>\n" +
                 "<body>\n" +
-               /* "<img src=\"" + species.getThumbnailURL() + "\"/>"+
-                "\n" + "<p>"+ species.getDescription() +"</p>" +*/
+                "<h1>" + species.getScientificName() + "</h1>" +
+                "<img src=\"" + species.getThumbnailURL() + "\"/>"+
+                "\n" + "<p>"+ species.getDescription() +"</p>" +
                 sb.toString() +
-                "</body>\n" + "<iframe width=\"425\" height=\"350\" frameborder=\"0\" scrolling=\"no\" marginheight=\"0\" marginwidth=\"0\" src=\"http://www.openstreetmap.org/export/embed.html?bbox=12.148132324218748%2C52.06093458403525%2C14.1119384765625%2C52.8226825580693&amp;layer=mapnik\" style=\"border: 1px solid black\">\n" +
-                "</iframe>\n" +
-                "<br/>\n" +
-                "<small>\n" +
-                "<a href=\"http://www.openstreetmap.org/#map=10/"+latitude +"/" + longitude + "\">\n" +
-                "Größere Karte anzeigen</a>\n" +
+                "<h2>Map</h2>" +
+                "<iframe width=\"425\" height=\"350\" frameborder=\"0\" scrolling=\"no\" marginheight=\"0\" marginwidth=\"0\" " +
+                "src=\"http://www.openstreetmap.org/export/embed.html?bbox=" + (longitude - 0.5) + "%2C" +
+                (latitude - 0.5) + "%2C" + (longitude + 0.5) + "%2C" + (latitude + 0.5) + "&amp;layer=mapnik&amp;marker=" + latitude + "%2C" +longitude + "\"" +
+                " style=\"border: 1px solid black\"></iframe>" +
+                "<br/>" +
+                "<small>" +
+                "<a href=\"http://www.openstreetmap.org/?mlat=" + latitude +"&amp;mlon=" + longitude + "#map=10/" + latitude + "/" + latitude + "\">Größere Karte anzeigen</a></small>" +
                 "</small>" +
+                "</body>\n" +
                 "</html>");
     }
 }

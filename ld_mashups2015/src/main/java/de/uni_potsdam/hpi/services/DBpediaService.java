@@ -10,9 +10,9 @@ import de.uni_potsdam.hpi.data.Species;
 
 public class DBpediaService {
 
-    private String sparqlEndpoint = "http://de.dbpedia.org/sparql";
-    private String queryTemplate = "SELECT ?image ?abstract " +
-            "FROM <http://de.dbpedia.org> " +
+    private String sparqlEndpoint = "http://dbpedia.org/sparql";
+    private String queryTemplate = "SELECT ?image ?abstract ?animal " +
+            "FROM <http://dbpedia.org> " +
             "WHERE { " +
             "?animal <http://dbpedia.org/property/binomial> \"%s\"@en . " +
             "?animal <http://dbpedia.org/ontology/thumbnail> ?image . " +
@@ -31,10 +31,9 @@ public class DBpediaService {
         ResultSet results = qexec.execSelect();
         if (results.hasNext()){
             QuerySolution answer = results.next();
-            System.out.println(answer.getLiteral("abstract")); // instead assigning it to the species
-            System.out.println(answer.getResource("image").toString()); //assign to animal
             species.setDescription(answer.getLiteral("abstract").toString());
-            species.setThumbnailURL(answer.getResource("image").toString());
+            species.setThumbnailURL(answer.getResource("image").getURI());
+            species.setEntityURI(answer.getResource("animal").getURI());
         }
      }
 }
