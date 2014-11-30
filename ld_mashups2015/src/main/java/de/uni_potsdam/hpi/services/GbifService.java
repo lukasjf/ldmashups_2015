@@ -36,7 +36,8 @@ public class GbifService {
             System.out.println("Response Code : " + responseCode);
             JSONObject response = getResponse(occurrenceClient);
             JSONObject firstSpecies = response.getJSONArray("results").getJSONObject(0);
-            result = new Species(firstSpecies.getString("species"));
+            result = new Species(firstSpecies.getString("scientificName"),
+                    firstSpecies.getString("species"));
             occurrenceClient.disconnect();
         } catch (Exception e) {
             e.printStackTrace();
@@ -65,7 +66,8 @@ public class GbifService {
             System.out.println("Response Code : " + responseCode);
             JSONObject response = getResponse(occurrenceClient);
             JSONObject firstSpecies = response.getJSONArray("results").getJSONObject(0);
-            result = new Species(firstSpecies.getString("species"));
+            result = new Species(firstSpecies.getString("scientificName"),
+                    firstSpecies.getString("species"));
             occurrenceClient.disconnect();
         } catch (Exception e) {
             e.printStackTrace();

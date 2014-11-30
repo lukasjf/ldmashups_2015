@@ -28,7 +28,7 @@ public class DBpediaService {
     // searching for strings does not work yet, nor does it in the online endpoint
 	public void includeDataFromDBpedia(Species species){
 	    System.out.println(species.getScientificName());
-		String sparqlQueryString = String.format(queryTemplate, species.getScientificName());
+		String sparqlQueryString = String.format(queryTemplate, species.getBinomial());
         Query query = QueryFactory.create(sparqlQueryString);
         QueryExecution qexec = QueryExecutionFactory
           .sparqlService(sparqlEndpoint, query);

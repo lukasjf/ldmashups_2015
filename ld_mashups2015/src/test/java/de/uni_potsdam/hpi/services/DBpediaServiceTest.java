@@ -13,7 +13,7 @@ public class DBpediaServiceTest{
     
     @Before
     public void initializeParusMajor(){
-        parusMajor = new Species("Parus major");
+        parusMajor = new Species("Parus major, Linnaeus, 1758", "Parus major");
     }
     @Test
     public void testIncludeDataFromDBpedia() {

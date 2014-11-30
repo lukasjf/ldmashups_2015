@@ -25,6 +25,7 @@ public class GbifTest{
         Species species = gbif.getSpeciesByLocation(51.0, 53.0, 12.0, 15.0);
         assertNotNull("species was null", species);
         assertNotNull("scientificName was not set", species.getScientificName());
+        assertNotNull("binomial was not set", species.getScientificName());
     }
 
     /**

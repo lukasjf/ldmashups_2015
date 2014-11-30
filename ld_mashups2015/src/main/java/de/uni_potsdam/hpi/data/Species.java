@@ -1,9 +1,12 @@
 package de.uni_potsdam.hpi.data;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.LinkedList;
 import java.util.List;
 
 import com.hp.hpl.jena.rdf.model.*;
+import com.hp.hpl.jena.util.URIref;
 
 /**
  * Holds all the informations about a species
@@ -19,12 +22,14 @@ public class Species {;
     private String kingdom;
     private String phylum;
     private String family;
+    private String binomial;
     private String taxonClass;
     private List<String> equivalentWebpages;
     private List<String> imageUrls;
 
-    public Species(String scientificName) {
+    public Species(String scientificName, String binomial) {
         this.scientificName = scientificName;
+        this.binomial = binomial;
     }
 
     /* BEGIN: Getter and Setter */
@@ -117,12 +122,23 @@ public class Species {;
     public void setTaxonClass(String taxonClass) {
         this.taxonClass = taxonClass;
     }
+
+
+    public String getBinomial() {
+        return binomial;
+    }
+
+    public void setBinomial(String binomial) {
+        this.binomial = binomial;
+    }
     /* END: Getter and Setter */
 
     /* BEGIN: RDF encoding */
     public void encodeSpeciesInRDF(){
         Model model = ModelFactory.createDefaultModel();
         Resource resource = model.createResource(getEntityURI());
+        resource.addProperty(ResourceFactory.createProperty("http://example.org"),
+                ResourceFactory.createResource("http://example.org/()braces()test()"));
         addNamePropertiesToSpecies(resource);
         addIdentificationToSpecies(resource);
         addMediaToSpecies(resource);
@@ -137,28 +153,28 @@ public class Species {;
         addFamilyToSpecies(resource);
         addTaxonClassToSpecies(resource);
         resource.addProperty(
-                ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/binomial"), getScientificName());
+                ResourceFactory.createProperty("http://dbpedia.org/property/binomial"), getBinomial());
         
     }
 
     private void addTaxonClassToSpecies(Resource resource) {
         resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/class"),
-                ResourceFactory.createProperty(taxonClass));
+                ResourceFactory.createResource(taxonClass));
     }
 
     private void addFamilyToSpecies(Resource resource) {
         resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/family"),
-                ResourceFactory.createProperty(family));
+                ResourceFactory.createResource(family));
     }
 
     private void addPhylumToSpecies(Resource resource) {
         resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/phylum"),
-                ResourceFactory.createProperty(phylum));
+                ResourceFactory.createResource(phylum));
     }
 
     private void addKingdomToSpecies(Resource resource) {
         resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/kingdom"),
-                ResourceFactory.createProperty(kingdom));
+                ResourceFactory.createResource(kingdom));
     }
 
     private void addMediaToSpecies(Resource resource) {

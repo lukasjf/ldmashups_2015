@@ -18,9 +18,9 @@ public class FreebaseService {
     private static final String MQL_API = "https://www.googleapis.com/freebase/v1/mqlread?query=";
     private static final String TOPIC_API = "https://www.googleapis.com/freebase/v1/topic%s?filter=/common/topic/";
 
-    public String findMidByName(String scientificName) {
+    public String findMidByName(String binomial) {
         String queryJson = "[{\"mid\": null, \"name\": null, \"type\": \"/biology/organism_classification\", "+
-                            "\"scientific_name\": \"" + scientificName + "\"}]";
+                            "\"scientific_name\": \"" + binomial + "\"}]";
         URL url;
         try {
             url = new URL(MQL_API + URLEncoder.encode(queryJson, "UTF-8"));
@@ -123,7 +123,7 @@ public class FreebaseService {
 
 
     public void includeDataFromFreebase(Species species) {
-        String mid = findMidByName(species.getScientificName());
+        String mid = findMidByName(species.getBinomial());
         species.setEquivalentWebpages(findEquivalentWebPagesByMid(mid));
         species.setImageUrls(findImageUrlsByMid(mid));
     }
