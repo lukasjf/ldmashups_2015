@@ -35,6 +35,8 @@ public class Occurrence {
                 "<h1>" + occurence.getSpecies().getScientificName() + "</h1>" +
                 "<img src=\"" + occurence.getSpecies().getThumbnailURL() + "\"/>"+
                 "\n" + "<p>"+ occurence.getSpecies().getDescription() +"</p>" +
+                "<a href=\"localhost:9998/species?species="+occurence.getSpecies().getBinomial()
+                    +"&scientificName="+occurence.getSpecies().getScientificName()+"\">Get To Animal Overview</a>"+
                 "<h2>Map</h2>" +
                 "<iframe width=\"425\" height=\"350\" frameborder=\"0\" scrolling=\"no\" marginheight=\"0\" marginwidth=\"0\" " +
                 "src=\"http://www.openstreetmap.org/export/embed.html?bbox=" + (longitude - 0.5) + "%2C" +

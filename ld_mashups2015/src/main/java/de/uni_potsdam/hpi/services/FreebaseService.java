@@ -19,15 +19,18 @@ public class FreebaseService {
     private static final String TOPIC_API = "https://www.googleapis.com/freebase/v1/topic%s?filter=/common/topic/";
 
     public String findMidByName(String binomial) {
-        String queryJson = "[{\"mid\": null, \"name\": null, \"type\": \"/biology/organism_classification\", "+
-                            "\"scientific_name\": \"" + binomial + "\"}]";
+        String queryJson = "[{"
+                + "\"mid\": null, "
+                + "\"name\": null, "
+                + "\"type\": \"/biology/organism_classification\", "
+                + "\"scientific_name\": \"" + binomial + "\""
+                + "}]";
         URL url;
         try {
             url = new URL(MQL_API + URLEncoder.encode(queryJson, "UTF-8"));
             HttpURLConnection mqlClient = (HttpURLConnection)url.openConnection();
             mqlClient.setRequestMethod("GET");
             int responseCode = mqlClient.getResponseCode();
-            System.out.println("Response Code: " + responseCode);
             if (200 != responseCode) {
                 throw new Exception("Request Failed!");
             }
