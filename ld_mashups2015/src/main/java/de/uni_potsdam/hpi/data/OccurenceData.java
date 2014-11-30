@@ -9,7 +9,7 @@ public class OccurenceData {
     private String latitude;
     private String longitude;
     private String geodeticDatum;
-    private SpeciesData occuredSpecies;
+    private SpeciesData species;
     private String basisOfRecord;
     private String entityURI;
     private String year;
@@ -78,11 +78,11 @@ public class OccurenceData {
     public void setGeodeticDatum(String geodeticDatum) {
         this.geodeticDatum = geodeticDatum;
     }
-    public SpeciesData getOccuredSpecies() {
-        return occuredSpecies;
+    public SpeciesData getSpecies() {
+        return species;
     }
-    public void setOccuredSpecies(SpeciesData occuredSpecies) {
-        this.occuredSpecies = occuredSpecies;
+    public void setSpecies(SpeciesData occuredSpecies) {
+        this.species = occuredSpecies;
     }
     public String getBasisOfRecord() {
         return basisOfRecord;

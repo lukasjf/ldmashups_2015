@@ -1,12 +1,12 @@
 package de.uni_potsdam.hpi.services;
 
+import de.uni_potsdam.hpi.data.OccurenceData;
 import de.uni_potsdam.hpi.data.SpeciesData;
+
 import org.json.JSONObject;
 
-import javax.ws.rs.Path;
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -50,8 +50,8 @@ public class GbifService {
                 longitude1 <= 180 && longitude2 <= 180 && longitude1 >= -180 && longitude2 >= -180);
     }
 
-    public SpeciesData getSpeciesByLocation(double latitude, double longitude) {
-        SpeciesData result = null;
+    public OccurenceData getOccurenceForLocation(double latitude, double longitude) {
+        OccurenceData result = null;
         if (!locationIsValid(latitude, latitude, longitude, longitude)) {
             System.err.println("Invalid Location");
             return null;
@@ -62,12 +62,10 @@ public class GbifService {
                     + "decimalLatitude=" + latitude);
             HttpURLConnection occurrenceClient = (HttpURLConnection)url.openConnection();
             occurrenceClient.setRequestMethod("GET");
-            int responseCode = occurrenceClient.getResponseCode();
-            System.out.println("Response Code : " + responseCode);
             JSONObject response = getResponse(occurrenceClient);
-            JSONObject firstSpecies = response.getJSONArray("results").getJSONObject(0);
-            result = new SpeciesData(firstSpecies.getString("scientificName"),
-                    firstSpecies.getString("species"));
+            JSONObject occurence = response.getJSONArray("results").getJSONObject(0);
+            result = new OccurenceData();
+            setFields(result,occurence);
             occurrenceClient.disconnect();
         } catch (Exception e) {
             e.printStackTrace();
@@ -75,6 +73,15 @@ public class GbifService {
         return result;
     }
 
+    private void setFields(OccurenceData result, JSONObject occurence) {
+        result.setLatitude(""+ occurence.getDouble("decimalLatitude"));
+        result.setLatitude(""+ occurence.getDouble("decimalLongitude"));
+        result.setEntityURI("http://www.gbif.org/occurrence/" + occurence.getInt("key"));
+        result.setSpecies(new SpeciesData(occurence.getString("scientificName"),occurence.getString("species")));
+        result.setYear(""+ occurence.getInt("year"));
+        result.setMonth(""+ occurence.getInt("month"));
+        result.setDay(""+ occurence.getInt("day"));
+    } 
 
     private JSONObject getResponse(HttpURLConnection mqlClient) throws IOException {
         InputStream is = mqlClient.getInputStream();

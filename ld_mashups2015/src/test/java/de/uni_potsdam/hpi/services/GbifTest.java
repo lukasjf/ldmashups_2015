@@ -34,9 +34,9 @@ public class GbifTest{
     @Test
     public void testLocationIsValid() {
         GbifService gbif = new GbifService();
-        assertEquals("allows too low latitude", gbif.getSpeciesByLocation(0, -181), null);
-        assertEquals("allows too high latitude", gbif.getSpeciesByLocation(0, 181), null);
-        assertEquals("allows too low longitude", gbif.getSpeciesByLocation(91, 0), null);
-        assertEquals("allows too high longitude", gbif.getSpeciesByLocation(-91, 0), null);
+        assertEquals("allows too low latitude", gbif.getOccurenceForLocation(0, -181), null);
+        assertEquals("allows too high latitude", gbif.getOccurenceForLocation(0, 181), null);
+        assertEquals("allows too low longitude", gbif.getOccurenceForLocation(91, 0), null);
+        assertEquals("allows too high longitude", gbif.getOccurenceForLocation(-91, 0), null);
     }
 }

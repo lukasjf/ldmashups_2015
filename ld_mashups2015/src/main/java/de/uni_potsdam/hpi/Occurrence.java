@@ -1,8 +1,7 @@
 package de.uni_potsdam.hpi;
 
-import de.uni_potsdam.hpi.data.SpeciesData;
+import de.uni_potsdam.hpi.data.OccurenceData;
 import de.uni_potsdam.hpi.services.DBpediaService;
-import de.uni_potsdam.hpi.services.FreebaseService;
 import de.uni_potsdam.hpi.services.GbifService;
 
 import javax.ws.rs.GET;
@@ -21,25 +20,11 @@ public class Occurrence {
     // The Java method will produce content identified by the MIME Media
     // type "text/html"
     @Produces("text/html")
-    public String getIt(@QueryParam("longitude") double longitude, @QueryParam("latitude") double latitude) {
+    public String getCoordinates(@QueryParam("longitude") double longitude, @QueryParam("latitude") double latitude) {
         GbifService gbif = new GbifService();
         DBpediaService db = new DBpediaService();
-        SpeciesData species = gbif.getSpeciesByLocation(latitude, longitude);
-        db.includeDataFromDBpedia(species);
-        FreebaseService fs = new FreebaseService();
-        fs.includeDataFromFreebase(species);
-        StringBuilder sb = new StringBuilder();
-        species.encodeSpeciesInRDF();
-        sb.append("<p>");
-        for (String url : species.getImageUrls()) {
-            sb.append("<img src=\"" + url + "\"/>");
-
-        }
-        sb.append("</p>");
-        sb.append("<h2>See also:</h2>");
-        for (String url : species.getEquivalentWebpages()) {
-            sb.append("<p><a href=\""+ url +"\">"+ url +"</a></p>");
-        }
+        OccurenceData occurence = gbif.getOccurenceForLocation(latitude, longitude);
+        db.includeDataFromDBpedia(occurence.getSpecies());
         return ("<!DOCTYPE html>\n" +
                 "<html>\n" +
                 "<head lang=\"en\">\n" +
@@ -47,10 +32,9 @@ public class Occurrence {
                 "    <title>Occurence</title>\n" +
                 "</head>\n" +
                 "<body>\n" +
-                "<h1>" + species.getScientificName() + "</h1>" +
-                "<img src=\"" + species.getThumbnailURL() + "\"/>"+
-                "\n" + "<p>"+ species.getDescription() +"</p>" +
-                sb.toString() +
+                "<h1>" + occurence.getSpecies().getScientificName() + "</h1>" +
+                "<img src=\"" + occurence.getSpecies().getThumbnailURL() + "\"/>"+
+                "\n" + "<p>"+ occurence.getSpecies().getDescription() +"</p>" +
                 "<h2>Map</h2>" +
                 "<iframe width=\"425\" height=\"350\" frameborder=\"0\" scrolling=\"no\" marginheight=\"0\" marginwidth=\"0\" " +
                 "src=\"http://www.openstreetmap.org/export/embed.html?bbox=" + (longitude - 0.5) + "%2C" +
