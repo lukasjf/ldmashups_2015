@@ -1,6 +1,6 @@
 package de.uni_potsdam.hpi.services;
 
-import de.uni_potsdam.hpi.data.Species;
+import de.uni_potsdam.hpi.data.SpeciesData;
 import org.json.JSONObject;
 
 import javax.ws.rs.Path;
@@ -20,8 +20,8 @@ public class GbifService {
     public GbifService() {
     }
 
-    public Species getSpeciesByLocation(double latitude1, double latitude2, double longitude1, double longitude2) {
-        Species result = null;
+    public SpeciesData getSpeciesByLocation(double latitude1, double latitude2, double longitude1, double longitude2) {
+        SpeciesData result = null;
         if (!locationIsValid(latitude1, latitude2, longitude1, longitude2)) {
             System.err.println("Invalid Location");
             return null;
@@ -36,7 +36,7 @@ public class GbifService {
             System.out.println("Response Code : " + responseCode);
             JSONObject response = getResponse(occurrenceClient);
             JSONObject firstSpecies = response.getJSONArray("results").getJSONObject(0);
-            result = new Species(firstSpecies.getString("scientificName"),
+            result = new SpeciesData(firstSpecies.getString("scientificName"),
                     firstSpecies.getString("species"));
             occurrenceClient.disconnect();
         } catch (Exception e) {
@@ -50,8 +50,8 @@ public class GbifService {
                 longitude1 <= 180 && longitude2 <= 180 && longitude1 >= -180 && longitude2 >= -180);
     }
 
-    public Species getSpeciesByLocation(double latitude, double longitude) {
-        Species result = null;
+    public SpeciesData getSpeciesByLocation(double latitude, double longitude) {
+        SpeciesData result = null;
         if (!locationIsValid(latitude, latitude, longitude, longitude)) {
             System.err.println("Invalid Location");
             return null;
@@ -66,7 +66,7 @@ public class GbifService {
             System.out.println("Response Code : " + responseCode);
             JSONObject response = getResponse(occurrenceClient);
             JSONObject firstSpecies = response.getJSONArray("results").getJSONObject(0);
-            result = new Species(firstSpecies.getString("scientificName"),
+            result = new SpeciesData(firstSpecies.getString("scientificName"),
                     firstSpecies.getString("species"));
             occurrenceClient.disconnect();
         } catch (Exception e) {

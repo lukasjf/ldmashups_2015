@@ -6,7 +6,7 @@ import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
-import de.uni_potsdam.hpi.data.Species;
+import de.uni_potsdam.hpi.data.SpeciesData;
 
 public class DBpediaService {
 
@@ -26,7 +26,7 @@ public class DBpediaService {
 
 
     // searching for strings does not work yet, nor does it in the online endpoint
-	public void includeDataFromDBpedia(Species species){
+	public void includeDataFromDBpedia(SpeciesData species){
 	    System.out.println(species.getScientificName());
 		String sparqlQueryString = String.format(queryTemplate, species.getBinomial());
         Query query = QueryFactory.create(sparqlQueryString);

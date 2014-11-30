@@ -2,7 +2,7 @@ package de.uni_potsdam.hpi.services;
 
 import org.junit.Test;
 
-import de.uni_potsdam.hpi.data.Species;
+import de.uni_potsdam.hpi.data.SpeciesData;
 import de.uni_potsdam.hpi.services.GbifService;
 import static org.junit.Assert.*;
 
@@ -22,7 +22,7 @@ public class GbifTest{
     @Test
     public void testSpeciesScientificName() {
         GbifService gbif = new GbifService();
-        Species species = gbif.getSpeciesByLocation(51.0, 53.0, 12.0, 15.0);
+        SpeciesData species = gbif.getSpeciesByLocation(51.0, 53.0, 12.0, 15.0);
         assertNotNull("species was null", species);
         assertNotNull("scientificName was not set", species.getScientificName());
         assertNotNull("binomial was not set", species.getScientificName());

@@ -1,20 +1,18 @@
 package de.uni_potsdam.hpi;
 
-import de.uni_potsdam.hpi.data.SpeciesData;
-import de.uni_potsdam.hpi.services.DBpediaService;
-import de.uni_potsdam.hpi.services.FreebaseService;
-import de.uni_potsdam.hpi.services.GbifService;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
-// The Java class will be hosted at the URI path "/occurrence"
-@Path("/occurrences")
-public class Occurrence {
+import de.uni_potsdam.hpi.data.SpeciesData;
+import de.uni_potsdam.hpi.services.DBpediaService;
+import de.uni_potsdam.hpi.services.FreebaseService;
+import de.uni_potsdam.hpi.services.GbifService;
 
-    // TODO: update the class to suit your needs
+@Path("/species")
+public class Species {
+ // TODO: update the class to suit your needs
 
     // The Java method will process HTTP GET requests
     @GET

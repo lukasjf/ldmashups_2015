@@ -4,16 +4,16 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.uni_potsdam.hpi.data.Species;
+import de.uni_potsdam.hpi.data.SpeciesData;
 import de.uni_potsdam.hpi.services.DBpediaService;
 
 public class DBpediaServiceTest{
 
-    Species parusMajor;
+    SpeciesData parusMajor;
     
     @Before
     public void initializeParusMajor(){
-        parusMajor = new Species("Parus major, Linnaeus, 1758", "Parus major");
+        parusMajor = new SpeciesData("Parus major, Linnaeus, 1758", "Parus major");
     }
     @Test
     public void testIncludeDataFromDBpedia() {

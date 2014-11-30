@@ -1,12 +1,9 @@
 package de.uni_potsdam.hpi.data;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.LinkedList;
 import java.util.List;
 
 import com.hp.hpl.jena.rdf.model.*;
-import com.hp.hpl.jena.util.URIref;
 
 /**
  * Holds all the informations about a species
@@ -14,7 +11,7 @@ import com.hp.hpl.jena.util.URIref;
  * @author Stpehan
  * @version 11/11/14
  */
-public class Species {;
+public class SpeciesData {;
     /** Holds the scientific Name of the species */
     private String scientificName;
     private String thumbnailURL;
@@ -27,7 +24,7 @@ public class Species {;
     private List<String> equivalentWebpages;
     private List<String> imageUrls;
 
-    public Species(String scientificName, String binomial) {
+    public SpeciesData(String scientificName, String binomial) {
         this.scientificName = scientificName;
         this.binomial = binomial;
     }

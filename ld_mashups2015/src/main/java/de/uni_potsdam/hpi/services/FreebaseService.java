@@ -1,6 +1,6 @@
 package de.uni_potsdam.hpi.services;
 
-import de.uni_potsdam.hpi.data.Species;
+import de.uni_potsdam.hpi.data.SpeciesData;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -122,7 +122,7 @@ public class FreebaseService {
     }
 
 
-    public void includeDataFromFreebase(Species species) {
+    public void includeDataFromFreebase(SpeciesData species) {
         String mid = findMidByName(species.getBinomial());
         species.setEquivalentWebpages(findEquivalentWebPagesByMid(mid));
         species.setImageUrls(findImageUrlsByMid(mid));
