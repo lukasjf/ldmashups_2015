@@ -15,7 +15,8 @@ public class Species {
     /** Holds the scientific Name of the species */
     private String scientificName;
     private String thumbnailURL;
-    private String Description;
+    private String description;
+    private String kingdom;
     private List<String> equivalentWebpages;
     private List<String> imageUrls;
 
@@ -46,11 +47,11 @@ public class Species {
     }
 
     public String getDescription() {
-        return Description;
+        return description;
     }
 
     public void setDescription(String Description) {
-        this.Description = Description;
+        this.description = Description;
     }
 
     public List<String> getEquivalentWebpages() {
@@ -82,24 +83,48 @@ public class Species {
         addIdentificationToSpecies(resource);
         addMediaToSpecies(resource);
         addTaxonToSpecies(resource);
-        addDescriptionToSpecies(resource);
+        addAbstractToSpecies(resource);
         model.write(System.out, "N-Triples");
     }
 
     private void addTaxonToSpecies(Resource resource) {
+        addKingdomToSpecies(resource);
         resource.addProperty(
                 ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/binomial"), getScientificName());
         
     }
 
+    private void addKingdomToSpecies(Resource resource) {
+        Property kingdomProp = ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/kingdom");
+        Property kingdomValue = null;
+        if (kingdom.equals("Animalia")) {
+            kingdomValue = ResourceFactory.createProperty("http://dbpedia.org/resource/Animal");
+        } else if (kingdom.equals("Plantae")) {
+            kingdomValue = ResourceFactory.createProperty("http://dbpedia.org/resource/Plant");
+        } else if (kingdom.equals("Fungi")) {
+            kingdomValue = ResourceFactory.createProperty("http://dbpedia.org/page/Fungus");
+        }
+
+        if (null == kingdomValue) {
+            resource.addProperty(kingdomProp, kingdom);
+        } else {
+            resource.addProperty(kingdomProp, kingdomValue);
+        }
+    }
+
     private void addMediaToSpecies(Resource resource) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < imageUrls.size(); i++) {
+            sb.append(imageUrls.get(i));
+            if (i < imageUrls.size() - 1) {
+                sb.append(" | ");
+            }
+        }
         if (getThumbnailURL() != null) {
-            resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/associatedMedia"), ResourceFactory.createResource(getThumbnailURL()));
+            sb.append(" | ");
+            sb.append(getThumbnailURL());
         }
-        for (String url : getImageUrls()) {
-            resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/associatedMedia"), ResourceFactory.createResource(url));
-        }
-        
+        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/associatedMedia"), sb.toString());
     }
 
     private void addIdentificationToSpecies(Resource resource) {
@@ -114,7 +139,15 @@ public class Species {
                 ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/scientificName"), getScientificName());
     }
 
-    private void addDescriptionToSpecies(Resource resource) {
-        
+    private void addAbstractToSpecies(Resource resource) {
+        resource.addProperty(ResourceFactory.createProperty("http://dbpedia.org/ontology/abstract"), getDescription());
+    }
+
+    public String getKingdom() {
+        return kingdom;
+    }
+
+    public void setKingdom(String kingdom) {
+        this.kingdom = kingdom;
     }
 }

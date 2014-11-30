@@ -39,6 +39,7 @@ public class GbifService {
             result = new Species();
             occurrenceClient.disconnect();
             result.setScientificName(firstSpecies.getString("species"));
+            result.setKingdom(firstSpecies.getString("kingdom"));
         } catch (Exception e) {
             e.printStackTrace();
         }

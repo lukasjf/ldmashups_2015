@@ -1,4 +1,3 @@
-
 package de.uni_potsdam.hpi;
 
 import de.uni_potsdam.hpi.data.Species;
