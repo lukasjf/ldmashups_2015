@@ -11,15 +11,23 @@ import com.hp.hpl.jena.rdf.model.*;
  * @author Stpehan
  * @version 11/11/14
  */
-public class Species {
+public class Species {;
     /** Holds the scientific Name of the species */
     private String scientificName;
     private String thumbnailURL;
     private String description;
     private String kingdom;
+    private String phylum;
+    private String family;
+    private String taxonClass;
     private List<String> equivalentWebpages;
     private List<String> imageUrls;
 
+    public Species(String scientificName) {
+        this.scientificName = scientificName;
+    }
+
+    /* BEGIN: Getter and Setter */
     public String getEntityURI() {
         return entityURI;
     }
@@ -75,7 +83,43 @@ public class Species {
     public void setImageUrls(List<String> imageUrls) {
         this.imageUrls = imageUrls;
     }
-    
+
+    public String getKingdom() {
+        return kingdom;
+    }
+
+    public void setKingdom(String kingdom) {
+        if (null != kingdom && !kingdom.isEmpty())
+            this.kingdom = kingdom;
+    }
+
+    public String getPhylum() {
+        return phylum;
+    }
+
+    public void setPhylum(String phylum) {
+        if (null != phylum && !phylum.isEmpty())
+            this.phylum = phylum;
+    }
+
+    public String getFamily() {
+        return family;
+    }
+
+    public void setFamily(String family) {
+        this.family = family;
+    }
+
+    public String getTaxonClass() {
+        return taxonClass;
+    }
+
+    public void setTaxonClass(String taxonClass) {
+        this.taxonClass = taxonClass;
+    }
+    /* END: Getter and Setter */
+
+    /* BEGIN: RDF encoding */
     public void encodeSpeciesInRDF(){
         Model model = ModelFactory.createDefaultModel();
         Resource resource = model.createResource(getEntityURI());
@@ -89,27 +133,32 @@ public class Species {
 
     private void addTaxonToSpecies(Resource resource) {
         addKingdomToSpecies(resource);
+        addPhylumToSpecies(resource);
+        addFamilyToSpecies(resource);
+        addTaxonClassToSpecies(resource);
         resource.addProperty(
                 ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/binomial"), getScientificName());
         
     }
 
-    private void addKingdomToSpecies(Resource resource) {
-        Property kingdomProp = ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/kingdom");
-        Property kingdomValue = null;
-        if (kingdom.equals("Animalia")) {
-            kingdomValue = ResourceFactory.createProperty("http://dbpedia.org/resource/Animal");
-        } else if (kingdom.equals("Plantae")) {
-            kingdomValue = ResourceFactory.createProperty("http://dbpedia.org/resource/Plant");
-        } else if (kingdom.equals("Fungi")) {
-            kingdomValue = ResourceFactory.createProperty("http://dbpedia.org/page/Fungus");
-        }
+    private void addTaxonClassToSpecies(Resource resource) {
+        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/class"),
+                ResourceFactory.createProperty(taxonClass));
+    }
 
-        if (null == kingdomValue) {
-            resource.addProperty(kingdomProp, kingdom);
-        } else {
-            resource.addProperty(kingdomProp, kingdomValue);
-        }
+    private void addFamilyToSpecies(Resource resource) {
+        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/family"),
+                ResourceFactory.createProperty(family));
+    }
+
+    private void addPhylumToSpecies(Resource resource) {
+        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/phylum"),
+                ResourceFactory.createProperty(phylum));
+    }
+
+    private void addKingdomToSpecies(Resource resource) {
+        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/kingdom"),
+                ResourceFactory.createProperty(kingdom));
     }
 
     private void addMediaToSpecies(Resource resource) {
@@ -141,13 +190,5 @@ public class Species {
 
     private void addAbstractToSpecies(Resource resource) {
         resource.addProperty(ResourceFactory.createProperty("http://dbpedia.org/ontology/abstract"), getDescription());
-    }
-
-    public String getKingdom() {
-        return kingdom;
-    }
-
-    public void setKingdom(String kingdom) {
-        this.kingdom = kingdom;
     }
 }

@@ -13,14 +13,17 @@ public class DBpediaServiceTest{
     
     @Before
     public void initializeParusMajor(){
-        parusMajor = new Species();
-        parusMajor.setScientificName("Parus major");
+        parusMajor = new Species("Parus major");
     }
     @Test
     public void testIncludeDataFromDBpedia() {
         new DBpediaService().includeDataFromDBpedia(parusMajor);
         assertNotNull("could not extract Thumbnail", parusMajor.getThumbnailURL());
         assertNotNull("could not extract Descritpion", parusMajor.getDescription());
+        assertNotNull("could not extract Phylum", parusMajor.getPhylum());
+        assertNotNull("could not extract Kingdom", parusMajor.getKingdom());
+        assertNotNull("could not extract Family", parusMajor.getFamily());
+        assertNotNull("could not extract Class", parusMajor.getTaxonClass());
     }
     @Test
     public void testAbstractSpeciesName() {

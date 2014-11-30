@@ -11,12 +11,16 @@ import de.uni_potsdam.hpi.data.Species;
 public class DBpediaService {
 
     private String sparqlEndpoint = "http://dbpedia.org/sparql";
-    private String queryTemplate = "SELECT ?image ?abstract ?animal " +
+    private String queryTemplate = "SELECT ?image ?abstract ?kingdom ?phylum ?family ?animal ?class " +
             "FROM <http://dbpedia.org> " +
             "WHERE { " +
             "?animal <http://dbpedia.org/property/binomial> \"%s\"@en . " +
             "?animal <http://dbpedia.org/ontology/thumbnail> ?image . " +
             "?animal <http://dbpedia.org/ontology/abstract> ?abstract . " +
+            "?animal <http://dbpedia.org/ontology/kingdom> ?kingdom ." +
+            "?animal <http://dbpedia.org/ontology/phylum> ?phylum ." +
+            "?animal <http://dbpedia.org/ontology/family> ?family ." +
+            "?animal <http://dbpedia.org/ontology/class> ?class ." +
             "FILTER (LANG(?abstract) = \"en\")" +
             "} LIMIT 10";
 
@@ -34,6 +38,10 @@ public class DBpediaService {
             species.setDescription(answer.getLiteral("abstract").toString());
             species.setThumbnailURL(answer.getResource("image").getURI());
             species.setEntityURI(answer.getResource("animal").getURI());
+            species.setPhylum(answer.getResource("phylum").getURI());
+            species.setKingdom(answer.getResource("kingdom").getURI());
+            species.setFamily(answer.getResource("family").getURI());
+            species.setTaxonClass(answer.getResource("class").getURI());
         }
      }
 }

@@ -28,18 +28,6 @@ public class GbifTest{
     }
 
     /**
-     * Test if the returned species has a correct kingdom
-     */
-    @Test
-    public void testSpeciesKindom() {
-        GbifService gbif = new GbifService();
-        Species species = gbif.getSpeciesByLocation(51.0, 53.0, 12.0, 15.0);
-        assertNotNull("species was null", species);
-        assertNotNull("kingdom was not set", species.getKingdom());
-        assertEquals("kingdom does not equal 'Animalia'", species.getKingdom(), "Animalia");
-    }
-
-    /**
      * In case of a invalid Location null should be returned
      */
     @Test
