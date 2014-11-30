@@ -1,9 +1,14 @@
 package de.uni_potsdam.hpi.data;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
 import com.hp.hpl.jena.rdf.model.*;
+import org.apache.jena.riot.RDFFormat;
 
 /**
  * Holds all the informations about a species
@@ -21,6 +26,7 @@ public class SpeciesData {;
     private String family;
     private String binomial;
     private String taxonClass;
+    private static final String FILE_URL = "resource/rdf/species.rdf";
     private List<String> equivalentWebpages;
     private List<String> imageUrls;
 
@@ -131,17 +137,30 @@ public class SpeciesData {;
     /* END: Getter and Setter */
 
     /* BEGIN: RDF encoding */
+
     public void encodeSpeciesInRDF(){
         Model model = ModelFactory.createDefaultModel();
         Resource resource = model.createResource(getEntityURI());
-        resource.addProperty(ResourceFactory.createProperty("http://example.org"),
-                ResourceFactory.createResource("http://example.org/()braces()test()"));
         addNamePropertiesToSpecies(resource);
         addIdentificationToSpecies(resource);
         addMediaToSpecies(resource);
         addTaxonToSpecies(resource);
         addAbstractToSpecies(resource);
+        writeRdfToFile(model);
         model.write(System.out, "N-Triples");
+    }
+
+    private void writeRdfToFile(Model model) {
+        File f = new File(FILE_URL);
+        try {
+            f.createNewFile();
+            FileWriter fw = new FileWriter(f, true);
+            model.write(fw, "TURTLE");
+        } catch (IOException e) {
+            System.err.println("Could not write File");
+            e.printStackTrace();
+        }
+
     }
 
     private void addTaxonToSpecies(Resource resource) {
@@ -151,7 +170,6 @@ public class SpeciesData {;
         addTaxonClassToSpecies(resource);
         resource.addProperty(
                 ResourceFactory.createProperty("http://dbpedia.org/property/binomial"), getBinomial());
-        
     }
 
     private void addTaxonClassToSpecies(Resource resource) {
