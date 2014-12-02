@@ -23,29 +23,6 @@ public class GbifService {
     public GbifService() {
     }
 
-    public SpeciesData getSpeciesByLocation(double latitude1, double latitude2, double longitude1, double longitude2) {
-        SpeciesData result = null;
-        if (!locationIsValid(latitude1, latitude2, longitude1, longitude2)) {
-            System.err.println("Invalid Location");
-            return null;
-        }
-        URL url = null;
-        try {
-            url = new URL(occurenceApiString + "search?decimalLongitude=" + longitude1 + "," + longitude2 + "&" +
-                    "decimalLatitude=" + latitude1 + "," + latitude2);
-            HttpURLConnection occurrenceClient = (HttpURLConnection)url.openConnection();
-            occurrenceClient.setRequestMethod("GET");
-            JSONObject response = getResponse(occurrenceClient);
-            JSONObject firstSpecies = response.getJSONArray("results").getJSONObject(0);
-            result = new SpeciesData(firstSpecies.getString("scientificName"),
-                    firstSpecies.getString("species"));
-            occurrenceClient.disconnect();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return result;
-    }
-
     private boolean locationIsValid(double latitude1, double latitude2, double longitude1, double longitude2) {
         return (latitude1 <= 90.0 && latitude2 <= 90.0 && latitude1 >= -90.0 && latitude2 >= -90.0 &&
                 longitude1 <= 180 && longitude2 <= 180 && longitude1 >= -180 && longitude2 >= -180);
@@ -85,7 +62,7 @@ public class GbifService {
         String queryString = "SELECT ?geodeticDatum ?year ?month ?day WHERE { " +
                 "?occurrence <http://rs.tdwg.org/dwc/terms/decimalLatitude> " + latitude + " . " +
                 "?occurrence <http://rs.tdwg.org/dwc/terms/decimalLongitude> " + longitude + " . " +
-                //"?occurrence <http://rs.tdwg.org/dwc/terms/geodeticDatum> ?geodeticDatum . " +
+                "?occurrence <http://rs.tdwg.org/dwc/terms/geodeticDatum> ?geodeticDatum . " +
                 "?occurrence <http://rs.tdwg.org/dwc/terms/year> ?year . " +
                 "?occurrence <http://rs.tdwg.org/dwc/terms/month> ?month . " +
                 "?occurrence <http://rs.tdwg.org/dwc/terms/day> ?day . " +
@@ -109,7 +86,7 @@ public class GbifService {
         result.setDay(querySolution.getLiteral("day").toString());
         result.setMonth(querySolution.getLiteral("month").toString());
         result.setYear(querySolution.getLiteral("year").toString());
-       // result.setGeodeticDatum(querySolution.getLiteral("geodeticDatum").toString());
+        result.setGeodeticDatum(querySolution.getLiteral("geodeticDatum").toString());
     }
 
     private void setFieldsFromJson(OccurenceData result, JSONObject occurence) {

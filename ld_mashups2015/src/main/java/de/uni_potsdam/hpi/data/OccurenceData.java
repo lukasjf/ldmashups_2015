@@ -29,8 +29,8 @@ public class OccurenceData {
         addCoordinatePropertiesToOccurrence(resource);
         addTimePropertiesToOccurrence(resource);
         addSpeciesToOccurrence(resource);
+        model.write(System.out, "TURTLE");
         writeRdfToFile(model);
-        model.write(System.out, "N-Triples");
     }
 
     
@@ -38,7 +38,7 @@ public class OccurenceData {
         File f = new File(FILE_URL);
         try {
             f.createNewFile();
-            FileWriter fw = new FileWriter(f, true);
+            FileWriter fw = new FileWriter(f);
             model.write(fw, "RDF/XML-ABBREV");
         } catch (IOException e) {
             System.err.println("Could not write File");
