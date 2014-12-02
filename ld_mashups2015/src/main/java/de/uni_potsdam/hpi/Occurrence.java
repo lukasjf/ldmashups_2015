@@ -25,6 +25,7 @@ public class Occurrence {
         DBpediaService db = new DBpediaService();
         OccurenceData occurence = gbif.getOccurenceForLocation(latitude, longitude);
         db.includeDataFromDBpedia(occurence.getSpecies());
+        occurence.encodeOccurrenceInRDF();
         return ("<!DOCTYPE html>\n" +
                 "<html>\n" +
                 "<head lang=\"en\">\n" +
