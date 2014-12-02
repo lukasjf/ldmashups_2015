@@ -1,5 +1,8 @@
 package de.uni_potsdam.hpi.services;
 
+import com.hp.hpl.jena.query.*;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.util.FileManager;
 import de.uni_potsdam.hpi.data.OccurenceData;
 import de.uni_potsdam.hpi.data.SpeciesData;
 
@@ -52,6 +55,12 @@ public class GbifService {
 
     public OccurenceData getOccurenceForLocation(double latitude, double longitude) {
         OccurenceData result = null;
+        result = searchExistingEntries(latitude, longitude);
+
+        if (null != result) {
+           return result;
+        }
+
         if (!locationIsValid(latitude, latitude, longitude, longitude)) {
             System.err.println("Invalid Location");
             return null;
@@ -65,7 +74,7 @@ public class GbifService {
             JSONObject response = getResponse(occurrenceClient);
             JSONObject occurence = response.getJSONArray("results").getJSONObject(0);
             result = new OccurenceData();
-            setFields(result,occurence);
+            setFieldsFromJson(result, occurence);
             occurrenceClient.disconnect();
         } catch (Exception e) {
             e.printStackTrace();
@@ -73,9 +82,41 @@ public class GbifService {
         return result;
     }
 
-    private void setFields(OccurenceData result, JSONObject occurence) {
+    private OccurenceData searchExistingEntries(double latitude, double longitude) {
+        Model model = FileManager.get().loadModel(OccurenceData.FILE_URL, "RDF/XML-ABBREV");
+        String queryString = "SELECT ?geodeticDatum ?year ?month ?day WHERE { " +
+                "?occurrence <http://rs.tdwg.org/dwc/terms/decimalLatitude> " + latitude + " . " +
+                "?occurrence <http://rs.tdwg.org/dwc/terms/decimalLongitude> " + longitude + " . " +
+                //"?occurrence <http://rs.tdwg.org/dwc/terms/geodeticDatum> ?geodeticDatum . " +
+                "?occurrence <http://rs.tdwg.org/dwc/terms/year> ?year . " +
+                "?occurrence <http://rs.tdwg.org/dwc/terms/month> ?month . " +
+                "?occurrence <http://rs.tdwg.org/dwc/terms/day> ?day . " +
+                "}";
+        Query query = QueryFactory.create(queryString);
+        QueryExecution queryExec = QueryExecutionFactory.create(query, model);
+        ResultSet resultSet = queryExec.execSelect();
+        if (null != resultSet) {
+            while (resultSet.hasNext()) {
+                OccurenceData result = new OccurenceData();
+                setFieldsFromQuery(result, resultSet.nextSolution());
+                result.setLatitude("" + latitude);
+                result.setLongitude("" + longitude);
+                return result;
+            }
+        }
+        return null;
+    }
+
+    private void setFieldsFromQuery(OccurenceData result, QuerySolution querySolution) {
+        result.setDay(querySolution.getLiteral("day").toString());
+        result.setMonth(querySolution.getLiteral("month").toString());
+        result.setYear(querySolution.getLiteral("year").toString());
+       // result.setGeodeticDatum(querySolution.getLiteral("geodeticDatum").toString());
+    }
+
+    private void setFieldsFromJson(OccurenceData result, JSONObject occurence) {
         result.setLatitude(""+ occurence.getDouble("decimalLatitude"));
-        result.setLatitude(""+ occurence.getDouble("decimalLongitude"));
+        result.setLongitude("" + occurence.getDouble("decimalLongitude"));
         result.setEntityURI("http://www.gbif.org/occurrence/" + occurence.getInt("key"));
         result.setSpecies(new SpeciesData(occurence.getString("scientificName"),occurence.getString("species")));
         result.setYear(""+ occurence.getInt("year"));

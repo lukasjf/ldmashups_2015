@@ -1,19 +1,20 @@
 package de.uni_potsdam.hpi.data;
 
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.hp.hpl.jena.rdf.model.*;
-import org.apache.jena.riot.RDFFormat;
-
 /**
- * Holds all the informations about a species
+ * Holds all the information about a species
  *
- * @author Stpehan
+ * @author Stephan
  * @version 11/11/14
  */
 public class SpeciesData {;

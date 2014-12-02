@@ -5,7 +5,12 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 public class OccurenceData {
+    public static final String FILE_URL = "resource/rdf/occurrence.rdf";
     private String latitude;
     private String longitude;
     private String geodeticDatum;
@@ -16,32 +21,49 @@ public class OccurenceData {
     private String month;
     private String day;
 
-    public void encodeSpeciesInRDF(){
+    /* RDF Encoding */
+    public void encodeOccurrenceInRDF(){
         Model model = ModelFactory.createDefaultModel();
         Resource resource = model.createResource(getEntityURI());
         addCoordinatePropertiesToOccurence(resource);
         addTimePropertiesToOccurence(resource);
+        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/taxonID"),
+                ResourceFactory.createResource(species.getEntityURI()));
+        writeRdfToFile(model);
         model.write(System.out, "N-Triples");
+    }
+
+    private void writeRdfToFile(Model model) {
+        File f = new File(FILE_URL);
+        try {
+            f.createNewFile();
+            FileWriter fw = new FileWriter(f, true);
+            model.write(fw, "RDF/XML-ABBREV");
+        } catch (IOException e) {
+            System.err.println("Could not write File");
+            e.printStackTrace();
+        }
     }
 
     private void addTimePropertiesToOccurence(Resource resource) {
         resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/year"),
-                ResourceFactory.createProperty(year));
+                year);
         resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/month"),
-                ResourceFactory.createProperty(month));
+                month);
         resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/day"),
-                ResourceFactory.createProperty(day));
+                day);
     }
 
     private void addCoordinatePropertiesToOccurence(Resource resource) {
         resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/decimalLatitude"),
-                ResourceFactory.createProperty(latitude));
+                latitude);
         resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/decimalLongitude"),
-                ResourceFactory.createProperty(longitude));
-        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/geodeticDatum"),
-                ResourceFactory.createProperty(geodeticDatum));
+                longitude);
+        /*resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/geodeticDatum"),
+                geodeticDatum);*/
     }
-    
+
+    /* BEGIN: Getter and Setter */
     public String getDay() {
         return day;
     }
@@ -96,4 +118,5 @@ public class OccurenceData {
     public void setEntityURI(String entityURI) {
         this.entityURI = entityURI;
     }
+    /* END: Getter and Setter */
 }
