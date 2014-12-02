@@ -81,7 +81,6 @@ public class FreebaseService {
             HttpURLConnection topicClient = (HttpURLConnection) url.openConnection();
             topicClient.setRequestMethod("GET");
             int responseCode = topicClient.getResponseCode();
-            System.out.println("Response Code: " + responseCode);
             if (200 != responseCode) {
                 throw new Exception("Request Failed!");
             }

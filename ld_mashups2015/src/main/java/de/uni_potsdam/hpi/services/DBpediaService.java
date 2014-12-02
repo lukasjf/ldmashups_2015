@@ -11,7 +11,7 @@ import de.uni_potsdam.hpi.data.SpeciesData;
 public class DBpediaService {
 
     private String sparqlEndpoint = "http://dbpedia.org/sparql";
-    private String queryTemplate = "SELECT ?image ?abstract ?kingdom ?phylum ?family ?animal ?class " +
+    private String queryTemplate = "SELECT ?image ?abstract ?kingdom ?phylum ?family ?animal ?class ?order ?genus " +
             "FROM <http://dbpedia.org> " +
             "WHERE { " +
             "?animal <http://dbpedia.org/property/binomial> \"%s\"@en . " +
@@ -21,13 +21,14 @@ public class DBpediaService {
             "?animal <http://dbpedia.org/ontology/phylum> ?phylum ." +
             "?animal <http://dbpedia.org/ontology/family> ?family ." +
             "?animal <http://dbpedia.org/ontology/class> ?class ." +
+            "?animal <http://dbpedia.org/ontology/order> ?order ." +
+            "?animal <http://dbpedia.org/ontology/genus> ?genus ." +
             "FILTER (LANG(?abstract) = \"en\")" +
             "} LIMIT 10";
 
 
     // searching for strings does not work yet, nor does it in the online endpoint
 	public void includeDataFromDBpedia(SpeciesData species){
-	    System.out.println(species.getScientificName());
 		String sparqlQueryString = String.format(queryTemplate, species.getBinomial());
         Query query = QueryFactory.create(sparqlQueryString);
         QueryExecution qexec = QueryExecutionFactory
@@ -42,6 +43,8 @@ public class DBpediaService {
             species.setKingdom(answer.getResource("kingdom").getURI());
             species.setFamily(answer.getResource("family").getURI());
             species.setTaxonClass(answer.getResource("class").getURI());
+            species.setOrder(answer.getResource("order").getURI());
+            species.setGenus(answer.getResource("genus").getURI());
         }
      }
 }

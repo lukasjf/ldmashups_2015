@@ -1,5 +1,6 @@
 package de.uni_potsdam.hpi.data;
 
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -19,27 +20,33 @@ public class OccurenceData {
     public void encodeSpeciesInRDF(){
         Model model = ModelFactory.createDefaultModel();
         Resource resource = model.createResource(getEntityURI());
-        addCoordinatePropertiesToOccurence(resource);
-        addTimePropertiesToOccurence(resource);
+        addCoordinatePropertiesToOccurrence(resource);
+        addTimePropertiesToOccurrence(resource);
+        addSpeciesToOccurrence(resource);
         model.write(System.out, "N-Triples");
     }
 
-    private void addTimePropertiesToOccurence(Resource resource) {
-        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/year"),
-                ResourceFactory.createProperty(year));
-        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/month"),
-                ResourceFactory.createProperty(month));
-        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/day"),
-                ResourceFactory.createProperty(day));
+    private void addSpeciesToOccurrence(Resource resource) {
+        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/associatedTaxa"),
+                ResourceFactory.createResource(species.getEntityURI()));
     }
 
-    private void addCoordinatePropertiesToOccurence(Resource resource) {
+    private void addTimePropertiesToOccurrence(Resource resource) {
+        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/year"),
+                ResourceFactory.createTypedLiteral(year, XSDDatatype.XSDgYear));
+        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/month"),
+                ResourceFactory.createTypedLiteral(month, XSDDatatype.XSDgMonth));
+        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/day"),
+                ResourceFactory.createTypedLiteral(day, XSDDatatype.XSDgDay));
+    }
+
+    private void addCoordinatePropertiesToOccurrence(Resource resource) {
         resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/decimalLatitude"),
-                ResourceFactory.createProperty(latitude));
+                ResourceFactory.createTypedLiteral(latitude, XSDDatatype.XSDdouble));
         resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/decimalLongitude"),
-                ResourceFactory.createProperty(longitude));
-        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/geodeticDatum"),
-                ResourceFactory.createProperty(geodeticDatum));
+                ResourceFactory.createTypedLiteral(longitude, XSDDatatype.XSDdouble));
+        resource.addProperty(
+                ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/geodeticDatum"), geodeticDatum);
     }
     
     public String getDay() {

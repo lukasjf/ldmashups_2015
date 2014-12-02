@@ -18,6 +18,7 @@ import org.apache.jena.riot.RDFFormat;
  */
 public class SpeciesData {;
     /** Holds the scientific Name of the species */
+    private String entityURI;
     private String scientificName;
     private String thumbnailURL;
     private String description;
@@ -25,6 +26,8 @@ public class SpeciesData {;
     private String phylum;
     private String family;
     private String binomial;
+    private String order;
+    private String genus;
     private String taxonClass;
     private static final String FILE_URL = "resource/rdf/species.rdf";
     private List<String> equivalentWebpages;
@@ -43,8 +46,6 @@ public class SpeciesData {;
     public void setEntityURI(String entityURI) {
         this.entityURI = entityURI;
     }
-
-    private String entityURI;
 
     public String getScientificName() {
         return scientificName;
@@ -164,32 +165,20 @@ public class SpeciesData {;
     }
 
     private void addTaxonToSpecies(Resource resource) {
-        addKingdomToSpecies(resource);
-        addPhylumToSpecies(resource);
-        addFamilyToSpecies(resource);
-        addTaxonClassToSpecies(resource);
-        resource.addProperty(
-                ResourceFactory.createProperty("http://dbpedia.org/property/binomial"), getBinomial());
-    }
-
-    private void addTaxonClassToSpecies(Resource resource) {
-        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/class"),
-                ResourceFactory.createResource(taxonClass));
-    }
-
-    private void addFamilyToSpecies(Resource resource) {
-        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/family"),
-                ResourceFactory.createResource(family));
-    }
-
-    private void addPhylumToSpecies(Resource resource) {
-        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/phylum"),
-                ResourceFactory.createResource(phylum));
-    }
-
-    private void addKingdomToSpecies(Resource resource) {
         resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/kingdom"),
                 ResourceFactory.createResource(kingdom));
+        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/phylum"),
+                ResourceFactory.createResource(phylum));
+        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/family"),
+                ResourceFactory.createResource(family));
+        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/class"),
+                ResourceFactory.createResource(taxonClass));
+        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/order"),
+                ResourceFactory.createResource(order));
+        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/genus"),
+                ResourceFactory.createResource(genus));
+        resource.addProperty(
+                ResourceFactory.createProperty("http://dbpedia.org/property/binomial"), getBinomial());
     }
 
     private void addMediaToSpecies(Resource resource) {
@@ -221,5 +210,21 @@ public class SpeciesData {;
 
     private void addAbstractToSpecies(Resource resource) {
         resource.addProperty(ResourceFactory.createProperty("http://dbpedia.org/ontology/abstract"), getDescription());
+    }
+
+    public String getOrder() {
+        return order;
+    }
+
+    public void setOrder(String order) {
+        this.order = order;
+    }
+
+    public String getGenus() {
+        return genus;
+    }
+
+    public void setGenus(String genus) {
+        this.genus = genus;
     }
 }

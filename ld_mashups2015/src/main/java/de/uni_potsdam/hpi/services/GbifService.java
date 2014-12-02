@@ -32,8 +32,6 @@ public class GbifService {
                     "decimalLatitude=" + latitude1 + "," + latitude2);
             HttpURLConnection occurrenceClient = (HttpURLConnection)url.openConnection();
             occurrenceClient.setRequestMethod("GET");
-            int responseCode = occurrenceClient.getResponseCode();
-            System.out.println("Response Code : " + responseCode);
             JSONObject response = getResponse(occurrenceClient);
             JSONObject firstSpecies = response.getJSONArray("results").getJSONObject(0);
             result = new SpeciesData(firstSpecies.getString("scientificName"),
@@ -81,6 +79,7 @@ public class GbifService {
         result.setYear(""+ occurence.getInt("year"));
         result.setMonth(""+ occurence.getInt("month"));
         result.setDay(""+ occurence.getInt("day"));
+        result.setGeodeticDatum(""+ occurence.get("geodeticDatum"));
     } 
 
     private JSONObject getResponse(HttpURLConnection mqlClient) throws IOException {
