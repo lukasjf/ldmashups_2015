@@ -35,6 +35,7 @@ public class Species {
         for (String url : species.getEquivalentWebpages()) {
             sb.append("<p><a href=\""+ url +"\">"+ url +"</a></p>");
         }
+        species.encodeSpeciesInRDF();
         return ("<!DOCTYPE html>\n" +
                 "<html>\n" +
                 "<head lang=\"en\">\n" +

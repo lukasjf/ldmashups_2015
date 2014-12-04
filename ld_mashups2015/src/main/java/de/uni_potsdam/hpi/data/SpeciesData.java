@@ -1,9 +1,6 @@
 package de.uni_potsdam.hpi.data;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.rdf.model.*;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -148,8 +145,8 @@ public class SpeciesData {;
         addMediaToSpecies(resource);
         addTaxonToSpecies(resource);
         addAbstractToSpecies(resource);
+        model.write(System.out, "TURTLE");
         writeRdfToFile(model);
-        model.write(System.out, "N-Triples");
     }
 
     private void writeRdfToFile(Model model) {
@@ -157,7 +154,7 @@ public class SpeciesData {;
         try {
             f.createNewFile();
             FileWriter fw = new FileWriter(f, true);
-            model.write(fw, "TURTLE");
+            model.write(fw, "RDF/XML-ABBREV");
         } catch (IOException e) {
             System.err.println("Could not write File");
             e.printStackTrace();
@@ -183,7 +180,7 @@ public class SpeciesData {;
     }
 
     private void addMediaToSpecies(Resource resource) {
-        StringBuilder sb = new StringBuilder();
+        /*StringBuilder sb = new StringBuilder();
         for (int i = 0; i < imageUrls.size(); i++) {
             sb.append(imageUrls.get(i));
             if (i < imageUrls.size() - 1) {
@@ -194,7 +191,14 @@ public class SpeciesData {;
             sb.append(" | ");
             sb.append(getThumbnailURL());
         }
-        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/associatedMedia"), sb.toString());
+        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/associatedMedia"), sb.toString());*/
+        Property media = ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/associatedMedia");
+        if (null != thumbnailURL) {
+            resource.addProperty(media, thumbnailURL);
+        }
+        for (String url : imageUrls) {
+            resource.addProperty(media, url);
+        }
     }
 
     private void addIdentificationToSpecies(Resource resource) {

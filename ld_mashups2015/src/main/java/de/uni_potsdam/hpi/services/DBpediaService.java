@@ -6,6 +6,7 @@ import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.model.Resource;
 import de.uni_potsdam.hpi.data.SpeciesData;
 
 public class DBpediaService {
@@ -18,7 +19,7 @@ public class DBpediaService {
             "?animal <http://dbpedia.org/ontology/thumbnail> ?image . " +
             "?animal <http://dbpedia.org/ontology/abstract> ?abstract . " +
             "?animal <http://dbpedia.org/ontology/kingdom> ?kingdom ." +
-            "?animal <http://dbpedia.org/ontology/phylum> ?phylum ." +
+            "OPTIONAL { ?animal <http://dbpedia.org/ontology/phylum> ?phylum . }" +
             "?animal <http://dbpedia.org/ontology/family> ?family ." +
             "?animal <http://dbpedia.org/ontology/class> ?class ." +
             "?animal <http://dbpedia.org/ontology/order> ?order ." +
@@ -39,7 +40,10 @@ public class DBpediaService {
             species.setDescription(answer.getLiteral("abstract").toString());
             species.setThumbnailURL(answer.getResource("image").getURI());
             species.setEntityURI(answer.getResource("animal").getURI());
-            species.setPhylum(answer.getResource("phylum").getURI());
+            Resource phylum;
+            if (null != (phylum = answer.getResource("phylum"))) {
+                species.setPhylum(phylum.getURI());
+            }
             species.setKingdom(answer.getResource("kingdom").getURI());
             species.setFamily(answer.getResource("family").getURI());
             species.setTaxonClass(answer.getResource("class").getURI());
