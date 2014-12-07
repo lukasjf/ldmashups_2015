@@ -1,5 +1,6 @@
 package de.uni_potsdam.hpi.data;
 
+import com.hp.hpl.jena.datatypes.xsd.impl.XSDDateType;
 import com.hp.hpl.jena.rdf.model.*;
 
 import java.io.File;
@@ -34,6 +35,10 @@ public class SpeciesData {;
     public SpeciesData(String scientificName, String binomial) {
         this.scientificName = scientificName;
         this.binomial = binomial;
+    }
+
+    public SpeciesData(String entityURI) {
+        this.entityURI = entityURI;
     }
 
     /* BEGIN: Getter and Setter */
@@ -140,6 +145,8 @@ public class SpeciesData {;
     public void encodeSpeciesInRDF(){
         Model model = ModelFactory.createDefaultModel();
         Resource resource = model.createResource(getEntityURI());
+        resource.addProperty(ResourceFactory.createProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
+                ResourceFactory.createResource("http://rs.tdwg.org/dwc/terms/Taxon"));
         addNamePropertiesToSpecies(resource);
         addIdentificationToSpecies(resource);
         addMediaToSpecies(resource);
