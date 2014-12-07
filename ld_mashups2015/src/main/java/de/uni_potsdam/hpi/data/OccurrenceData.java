@@ -10,7 +10,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class OccurenceData {
+public class OccurrenceData {
     public static final String FILE_URL = "resource/rdf/occurrence.rdf";
     private String latitude;
     private String longitude;

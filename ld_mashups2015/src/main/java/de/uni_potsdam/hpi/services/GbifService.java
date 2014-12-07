@@ -3,14 +3,18 @@ package de.uni_potsdam.hpi.services;
 import com.hp.hpl.jena.query.*;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.util.FileManager;
-import de.uni_potsdam.hpi.data.OccurenceData;
+
+import de.uni_potsdam.hpi.data.OccurrenceData;
 import de.uni_potsdam.hpi.data.SpeciesData;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author Stephan
@@ -27,9 +31,37 @@ public class GbifService {
         return (latitude1 <= 90.0 && latitude2 <= 90.0 && latitude1 >= -90.0 && latitude2 >= -90.0 &&
                 longitude1 <= 180 && longitude2 <= 180 && longitude1 >= -180 && longitude2 >= -180);
     }
+    
+    public List<OccurrenceData> getOccurenceForLocation
+        (double latitude1, double latitude2, double longitude1, double longitude2){
+        List <OccurrenceData> result = new LinkedList<OccurrenceData>();
+        if (!locationIsValid(latitude1, latitude2, longitude1, longitude2)) {
+            System.err.println("Invalid Location");
+            return null;
+        }
+        URL url = null;
+        try {
+            url = new URL(occurenceApiString + "search?decimalLongitude=" + longitude1+ "," + longitude2 + 
+                    "&" + "decimalLatitude=" + latitude1 + "," + latitude2);
+            HttpURLConnection occurrenceClient = (HttpURLConnection)url.openConnection();
+            occurrenceClient.setRequestMethod("GET");
+            JSONObject response = getResponse(occurrenceClient);
+            JSONArray occurrences = response.getJSONArray("results");
+            for (int i = 0; i < occurrences.length(); i++){
+                JSONObject occurrence = occurrences.getJSONObject(i);
+                OccurrenceData entry = new OccurrenceData();
+                setFieldsFromJson(entry, occurrence);
+                result.add(entry);
+            }
+            occurrenceClient.disconnect();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
 
-    public OccurenceData getOccurenceForLocation(double latitude, double longitude) {
-        OccurenceData result = null;
+    public OccurrenceData getOccurenceForLocation(double latitude, double longitude) {
+        OccurrenceData result = null;
         result = searchExistingEntries(latitude, longitude);
 
         if (null != result) {
@@ -48,7 +80,7 @@ public class GbifService {
             occurrenceClient.setRequestMethod("GET");
             JSONObject response = getResponse(occurrenceClient);
             JSONObject occurence = response.getJSONArray("results").getJSONObject(0);
-            result = new OccurenceData();
+            result = new OccurrenceData();
             setFieldsFromJson(result, occurence);
             occurrenceClient.disconnect();
         } catch (Exception e) {
@@ -57,8 +89,8 @@ public class GbifService {
         return result;
     }
 
-    private OccurenceData searchExistingEntries(double latitude, double longitude) {
-        Model model = FileManager.get().loadModel(OccurenceData.FILE_URL, "RDF/XML-ABBREV");
+    private OccurrenceData searchExistingEntries(double latitude, double longitude) {
+        Model model = FileManager.get().loadModel(OccurrenceData.FILE_URL, "RDF/XML-ABBREV");
         String queryString = "SELECT ?geodeticDatum ?year ?month ?day WHERE { " +
                 "?occurrence <http://rs.tdwg.org/dwc/terms/decimalLatitude> " + latitude + " . " +
                 "?occurrence <http://rs.tdwg.org/dwc/terms/decimalLongitude> " + longitude + " . " +
@@ -72,7 +104,7 @@ public class GbifService {
         ResultSet resultSet = queryExec.execSelect();
         if (null != resultSet) {
             while (resultSet.hasNext()) {
-                OccurenceData result = new OccurenceData();
+                OccurrenceData result = new OccurrenceData();
                 setFieldsFromQuery(result, resultSet.nextSolution());
                 result.setLatitude("" + latitude);
                 result.setLongitude("" + longitude);
@@ -82,14 +114,14 @@ public class GbifService {
         return null;
     }
 
-    private void setFieldsFromQuery(OccurenceData result, QuerySolution querySolution) {
+    private void setFieldsFromQuery(OccurrenceData result, QuerySolution querySolution) {
         result.setDay(querySolution.getLiteral("day").toString());
         result.setMonth(querySolution.getLiteral("month").toString());
         result.setYear(querySolution.getLiteral("year").toString());
         result.setGeodeticDatum(querySolution.getLiteral("geodeticDatum").toString());
     }
 
-    private void setFieldsFromJson(OccurenceData result, JSONObject occurence) {
+    private void setFieldsFromJson(OccurrenceData result, JSONObject occurence) {
         result.setLatitude(""+ occurence.getDouble("decimalLatitude"));
         result.setLongitude("" + occurence.getDouble("decimalLongitude"));
         result.setEntityURI("http://www.gbif.org/occurrence/" + occurence.getInt("key"));
