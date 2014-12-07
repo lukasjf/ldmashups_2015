@@ -1,10 +1,17 @@
 package de.uni_potsdam.hpi;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 
 import de.uni_potsdam.hpi.data.OccurrenceData;
+import de.uni_potsdam.hpi.data.SpeciesData;
 import de.uni_potsdam.hpi.services.DBpediaService;
+import de.uni_potsdam.hpi.services.FreebaseService;
 import de.uni_potsdam.hpi.services.GbifService;
 
 import javax.ws.rs.GET;
@@ -13,14 +20,34 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+
 
 // The Java class will be hosted at the URI path "/occurrence"
-@Path("/occurrences")
-public class Occurrence {
+@Path("/")
+public class QueryEndpoint {
+    
+    private static Model model;
+    private static String DATA_PATH = "resource/rdf/data";
+    
+    private static Model getModel(){
+        if (null == model){
+            try {
+                if (!new File(DATA_PATH).exists()){
+                    new File(DATA_PATH).createNewFile();
+                }
+                InputStream input = new FileInputStream(DATA_PATH);
+                model.read(input,"");
+            } catch (IOException e) {
+                
+            }
+        }
+        return model;
+    }
 
-    // The Java method will process HTTP GET requests
     @GET
-
+    @Path("occurrences")
     public Response getCoordinates(@QueryParam("longitude") double longitude, @QueryParam("latitude") double latitude) {
         URI targetURIForRedirection = URI.create("localhost:9998?longitude1="+longitude+"&longitude2="+longitude+
                 "&latitude1="+latitude+"&latitude2="+latitude);
@@ -28,9 +55,8 @@ public class Occurrence {
     }
     
     @GET
-    // The Java method will produce content identified by the MIME Media
-    // type "text/html"
     @Produces("text/html")
+    @Path("occurrences")
     public String getCoordinates
         (@QueryParam("longitude1") double longitude1, @QueryParam("longitude2") double longitude2, 
                 @QueryParam("latitude1") double latitude1, @QueryParam("latitude2") double latitude2) {
@@ -66,5 +92,42 @@ public class Occurrence {
 //                "</small>");
         
         return sb.toString();
+    }
+    
+    @GET
+    @Produces("text/html")
+    @Path("species")
+    public String getIt(@QueryParam("species")String binomial, @QueryParam("scientificName")String scientificName) {
+        SpeciesData species = new SpeciesData(scientificName, binomial);
+        DBpediaService db = new DBpediaService();
+        db.includeDataFromDBpedia(species);
+        FreebaseService fs = new FreebaseService();
+        fs.includeDataFromFreebase(species);
+        StringBuilder sb = new StringBuilder();
+        sb.append("<p>");
+        for (String url : species.getImageUrls()) {
+            sb.append("<img src=\"" + url + "\"/>");
+
+        }
+        sb.append("</p>");
+        sb.append("<h2>See also:</h2>");
+        for (String url : species.getEquivalentWebpages()) {
+            sb.append("<p><a href=\""+ url +"\">"+ url +"</a></p>");
+        }
+        species.encodeSpeciesInRDF();
+        return ("<!DOCTYPE html>\n" +
+                "<html>\n" +
+                "<head lang=\"en\">\n" +
+                "    <meta charset=\"UTF-8\">\n" +
+                "    <title>Occurence</title>\n" +
+                "</head>\n" +
+                "<body>\n" +
+                "<h1>" + species.getScientificName() + "</h1>" +
+                "<img src=\"" + species.getThumbnailURL() + "\"/>"+
+                "\n" + "<p>"+ species.getDescription() +"</p>" +
+                sb.toString() +
+                "</small>" +
+                "</body>\n" +
+                "</html>");
     }
 }
