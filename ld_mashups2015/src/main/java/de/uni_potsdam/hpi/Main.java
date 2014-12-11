@@ -1,36 +1,38 @@
 
 package de.uni_potsdam.hpi;
 
-import com.sun.grizzly.http.SelectorThread;
-import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
+import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
+import org.glassfish.jersey.server.ResourceConfig;
+
 import java.io.IOException;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-import javax.ws.rs.core.UriBuilder;
 
 
 public class Main {
 
-    public static final URI BASE_URI = UriBuilder.fromUri("http://localhost/").port(9998).build();
+    //public static final URI BASE_URI = UriBuilder.fromUri("http://localhost/").port(9998).build();
+    public static final String BASE_URI = "http://localhost:9998";
 
-    protected static SelectorThread startServer() throws IOException {
-        final Map<String, String> initParams = new HashMap<String, String>();
+    protected static HttpServer startServer() throws IOException {
+        final ResourceConfig rc = new ResourceConfig().packages("de.uni_potsdam.hpi");
 
-        initParams.put("com.sun.jersey.config.property.packages", 
-                "de.uni_potsdam.hpi");
 
-        System.out.println("Starting grizzly...");
-        SelectorThread threadSelector = GrizzlyWebContainerFactory.create(BASE_URI, initParams);     
-        return threadSelector;
+        // create and start a new instance of grizzly http server
+        // exposing the Jersey application at BASE_URI
+        return GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), rc);
     }
-    
+
+    /**
+     * Main method.
+     * @param args
+     * @throws IOException
+     */
     public static void main(String[] args) throws IOException {
-        SelectorThread threadSelector = startServer();
+        final HttpServer server = startServer();
         System.out.println(String.format("Jersey app started with WADL available at "
-                + "%sapplication.wadl\nHit enter to stop it...",
-                BASE_URI));
+                + "%sapplication.wadl\nHit enter to stop it...", BASE_URI));
         System.in.read();
-        threadSelector.stopEndpoint();
+        server.stop();
     }
 }
