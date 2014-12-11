@@ -33,9 +33,8 @@ public class GbifService {
                 longitude1 <= 180 && longitude2 <= 180 && longitude1 >= -180 && longitude2 >= -180);
     }
     
-    public JSONArray getList
+    public JSONArray getOccurrenceForRange
         (double latitude1, double latitude2, double longitude1, double longitude2){
-            List <OccurrenceData> result = new LinkedList<OccurrenceData>();
             if (!locationIsValid(latitude1, latitude2, longitude1, longitude2)) {
                 System.err.println("Invalid Location");
                 return null;
@@ -43,7 +42,7 @@ public class GbifService {
             URL url = null;
             try {
                 url = new URL(occurenceApiString + "search?decimalLongitude=" + longitude1+ "," + longitude2 + 
-                        "&" + "decimalLatitude=" + latitude1 + "," + latitude2);
+                        "&" + "decimalLatitude=" + latitude1 + "," + latitude2+"&limit=1");
                 HttpURLConnection occurrenceClient = (HttpURLConnection)url.openConnection();
                 occurrenceClient.setRequestMethod("GET");
                 JSONObject response = getResponse(occurrenceClient);

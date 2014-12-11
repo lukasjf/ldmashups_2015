@@ -37,9 +37,9 @@ public class DBpediaService {
         ResultSet results = qexec.execSelect();
         if (results.hasNext()){
             QuerySolution answer = results.next();
+            species.setdBpediaURI(answer.getResource("animal").getURI());
             species.setDescription(answer.getLiteral("abstract").toString());
-            species.setThumbnailURL(answer.getResource("image").getURI());
-            species.setEntityURI(answer.getResource("animal").getURI());
+            species.setThumbnailURL(answer.getResource("image").getURI());     
             Resource phylum;
             if (null != (phylum = answer.getResource("phylum"))) {
                 species.setPhylum(phylum.getURI());

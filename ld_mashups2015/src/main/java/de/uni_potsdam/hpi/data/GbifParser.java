@@ -14,6 +14,7 @@ public class GbifParser {
         for(int i = 0; i < results.length(); i++){
             parseResult(results.getJSONObject(i), model);
         }
+        
     }
 
     private void parseResult(JSONObject result, Model model) {
@@ -26,8 +27,8 @@ public class GbifParser {
             return;
         }
         else{
-            OccurrenceData occurence = createNewOccurrenceData(result);
-            occurence.encodeOccurrenceInRDF(model);
+            OccurrenceData occurrence = createNewOccurrenceData(result);
+            occurrence.encodeOccurrenceInRDF(model);
         }
     }
 
@@ -37,12 +38,12 @@ public class GbifParser {
         occurrence.setLongitude("" + result.getDouble("decimalLongitude"));
         occurrence.setOccurrenceID("" + result.getInt("key"));
         occurrence.setEntityURI("http://www.gbif.org/occurrence/" + result.getInt("key"));
-        occurrence.setSpecies(new SpeciesData(result.getString("scientificName"),result.getString("species")));
         occurrence.setYear(""+ result.getInt("year"));
         occurrence.setMonth(""+ result.getInt("month"));
         occurrence.setDay(""+ result.getInt("day"));
         occurrence.setGeodeticDatum(""+ result.get("geodeticDatum"));
-        occurrence.setSpecies(new SpeciesData("http://www.gbif.org/species/" + result.getInt("speciesKey")));
+        occurrence.setSpecies(new SpeciesData(result.getString("scientificName"),result.getString("species")));
+        occurrence.getSpecies().setEntityURI("http://www.gbif.org/species/" + result.getInt("key"));
         return occurrence;
     }
 }

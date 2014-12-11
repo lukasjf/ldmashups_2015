@@ -1,15 +1,11 @@
 package de.uni_potsdam.hpi;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
-import java.util.List;
 
 import de.uni_potsdam.hpi.data.GbifParser;
-import de.uni_potsdam.hpi.data.OccurrenceData;
 import de.uni_potsdam.hpi.data.SpeciesData;
 import de.uni_potsdam.hpi.services.DBpediaService;
 import de.uni_potsdam.hpi.services.FreebaseService;
@@ -21,8 +17,15 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 
 
 // The Java class will be hosted at the URI path "/occurrence"
@@ -62,18 +65,41 @@ public class QueryEndpoint {
         (@QueryParam("longitude1") double longitude1, @QueryParam("longitude2") double longitude2, 
                 @QueryParam("latitude1") double latitude1, @QueryParam("latitude2") double latitude2) {
         GbifService gbif = new GbifService();
-        getModel();
-//        DBpediaService db = new DBpediaService();
-//        List<OccurrenceData> occurences = gbif.getOccurenceForLocation(latitude1, latitude2, longitude1, longitude2);
-        new GbifParser().parseData(gbif.getList(latitude1, latitude2, longitude1, longitude2), getModel());       
+        new GbifParser().parseData
+            (gbif.getOccurrenceForRange(latitude1, latitude2, longitude1, longitude2), getModel());       
+
+        String occurrenceQuery = "Select ?occurrence ?latitude ?species where{"+
+                "?occurrence <http://rs.tdwg.org/dwc/terms/decimalLatitude> ?latitude ."+
+                "?occurrence <http://rs.tdwg.org/dwc/terms/decimalLatitude> ?longitude ."+
+                "?occurence <http://rs.tdwg.org/dwc/terms/associatedTaxa> ?species ."+
+                "FILTER(?latitude >= "+latitude1+") ."+
+                "FILTER(?latitude <= "+latitude2+") ."+
+                "FILTER(?longitude >= "+longitude1+") ."+
+                "FILTER(?longitude <= "+longitude2+") .}";
+        Query query = QueryFactory.create(occurrenceQuery);
+        QueryExecution qexec = QueryExecutionFactory
+          .create(query, getModel());
+        ResultSet results = qexec.execSelect();
+        while (results.hasNext()){
+            QuerySolution answer =  results.next();
+            if (!isSpeciesStored(answer.get("?species"))){
+                SpeciesData species = getSpecies(answer.get("species"));
+                new DBpediaService().includeDataFromDBpedia(species);
+                new FreebaseService().includeDataFromFreebase(species);
+                species.encodeSpeciesInRDF(getModel());
+            }
+        }
+        
         try {
             FileWriter fw;
             fw = new FileWriter(new File(DATA_PATH));
             model.write(fw, "TURTLE");
+            fw.close();
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        }        
+        }
+        
 //        StringBuilder sb = new StringBuilder();
 //        sb.append("<!DOCTYPE html>\n" +
 //                "<html>\n" +
@@ -105,6 +131,29 @@ public class QueryEndpoint {
         return "";
     }
     
+    private SpeciesData getSpecies(RDFNode species) {
+        String queryString = "SELECT ?binomial ?scientificName WHERE {"+
+                "<"+species.toString()+">" + " <http://rs.tdwg.org/dwc/terms/scientificName> ?scientificName ."+
+                "<"+species.toString()+">" + " <http://rs.tdwg.org/dwc/terms/binomial> ?binomial}";
+        Query query = QueryFactory.create(queryString);
+        QueryExecution qexec = QueryExecutionFactory
+          .create(query, model);
+        QuerySolution sol = qexec.execSelect().next();
+        SpeciesData s = new SpeciesData(sol.get("scientificName").asLiteral().getString(),
+                sol.get("binomial").asLiteral().getString());
+        s.setEntityURI(species.toString());
+        return s;
+    }
+
+    private boolean isSpeciesStored(RDFNode species) {
+        String queryString = "ASK WHERE {"+
+                "<"+species.toString()+">" + " <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://rs.tdwg.org/dwc/terms/Taxon>}";
+        Query query = QueryFactory.create(queryString);
+        QueryExecution qexec = QueryExecutionFactory
+          .create(query, model);
+        return qexec.execAsk();
+    }
+
     @GET
     @Produces("text/html")
     @Path("species")
@@ -125,7 +174,6 @@ public class QueryEndpoint {
         for (String url : species.getEquivalentWebpages()) {
             sb.append("<p><a href=\""+ url +"\">"+ url +"</a></p>");
         }
-        species.encodeSpeciesInRDF();
         return ("<!DOCTYPE html>\n" +
                 "<html>\n" +
                 "<head lang=\"en\">\n" +

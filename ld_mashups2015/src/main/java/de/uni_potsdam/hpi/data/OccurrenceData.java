@@ -28,12 +28,17 @@ public class OccurrenceData {
                 ResourceFactory.createTypedLiteral(occurrenceID, XSDDateType.XSDint));
         addCoordinatePropertiesToOccurrence(resource);
         addTimePropertiesToOccurrence(resource);
-        addSpeciesToOccurrence(resource);
+        addSpeciesToOccurrence(resource, model);
     }
     
-    private void addSpeciesToOccurrence(Resource resource) {
+    private void addSpeciesToOccurrence(Resource resource, Model model) {
         resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/associatedTaxa"),
                 ResourceFactory.createResource(species.getEntityURI()));
+        Resource taxon = model.createResource(species.getEntityURI());
+        taxon.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/scientificName"), 
+                ResourceFactory.createTypedLiteral(species.getScientificName(),XSDDatatype.XSDstring));
+        taxon.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/binomial"), 
+                ResourceFactory.createTypedLiteral(species.getBinomial(),XSDDatatype.XSDstring));
     }
     
     private void addTimePropertiesToOccurrence(Resource resource) {
