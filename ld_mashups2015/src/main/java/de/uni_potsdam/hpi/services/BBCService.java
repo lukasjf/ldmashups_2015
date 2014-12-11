@@ -33,7 +33,7 @@ public class BBCService {
                 Element clip = (Element)clips.item(i);
                 System.out.println(clip.getAttribute("rdf:about"));
             }
-        } catch (SAXException | IOException | ParserConfigurationException e) {
+        } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
