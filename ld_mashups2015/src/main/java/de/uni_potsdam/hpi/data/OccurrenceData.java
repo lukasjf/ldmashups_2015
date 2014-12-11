@@ -10,7 +10,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class OccurenceData {
+public class OccurrenceData {
     public static final String FILE_URL = "resource/rdf/occurrence.rdf";
     private String latitude;
     private String longitude;
@@ -56,8 +56,8 @@ public class OccurenceData {
                 ResourceFactory.createTypedLiteral(year, XSDDatatype.XSDgYear));
         resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/month"),
                 ResourceFactory.createTypedLiteral(month, XSDDatatype.XSDgMonth));
-        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/day"),
-                ResourceFactory.createTypedLiteral(day, XSDDatatype.XSDgDay));
+//        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/day"),
+//                ResourceFactory.createTypedLiteral(day, XSDDatatype.XSDgDay));
     }
 
     private void addCoordinatePropertiesToOccurrence(Resource resource) {
