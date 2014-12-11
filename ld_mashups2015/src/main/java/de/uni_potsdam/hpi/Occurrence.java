@@ -21,10 +21,13 @@ public class Occurrence {
     // The Java method will process HTTP GET requests
     @GET
 
-    public Response getCoordinates(@QueryParam("longitude") double longitude, @QueryParam("latitude") double latitude) {
-        URI targetURIForRedirection = URI.create("localhost:9998?longitude1="+longitude+"&longitude2="+longitude+
-                "&latitude1="+latitude+"&latitude2="+latitude);
-        return Response.seeOther(targetURIForRedirection).build();
+    public Response getCoordinates(@QueryParam("longitude") double longitude, @QueryParam("latitude") double latitude,
+            @QueryParam("distance")double distance) {
+        System.out.println(distance);
+//        URI targetURIForRedirection = URI.create("localhost:9998?longitude1="+longitude+"&longitude2="+longitude+
+//                "&latitude1="+latitude+"&latitude2="+latitude);
+//        return Response.temporaryRedirect(targetURIForRedirection).build();
+        return null;
     }
     
     @GET

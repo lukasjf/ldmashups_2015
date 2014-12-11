@@ -128,7 +128,7 @@ public class GbifService {
         result.setSpecies(new SpeciesData(occurence.getString("scientificName"),occurence.getString("species")));
         result.setYear(""+ occurence.getInt("year"));
         result.setMonth(""+ occurence.getInt("month"));
-        result.setDay(""+ occurence.getInt("day"));
+//        result.setDay(""+ occurence.getInt("day"));
         result.setGeodeticDatum(""+ occurence.get("geodeticDatum"));
     } 
 

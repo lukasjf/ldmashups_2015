@@ -56,8 +56,8 @@ public class OccurrenceData {
                 ResourceFactory.createTypedLiteral(year, XSDDatatype.XSDgYear));
         resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/month"),
                 ResourceFactory.createTypedLiteral(month, XSDDatatype.XSDgMonth));
-        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/day"),
-                ResourceFactory.createTypedLiteral(day, XSDDatatype.XSDgDay));
+//        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/day"),
+//                ResourceFactory.createTypedLiteral(day, XSDDatatype.XSDgDay));
     }
 
     private void addCoordinatePropertiesToOccurrence(Resource resource) {
