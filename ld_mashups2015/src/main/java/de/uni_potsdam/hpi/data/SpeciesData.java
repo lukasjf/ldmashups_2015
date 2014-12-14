@@ -65,8 +65,6 @@ public class SpeciesData {;
                 ResourceFactory.createResource(order));
         resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/genus"),
                 ResourceFactory.createResource(genus));
-//        resource.addProperty(
-//                ResourceFactory.createProperty("http://dbpedia.org/property/binomial"), getBinomial());
     }
 
     private void addMediaToSpecies(Resource resource) {
@@ -91,7 +89,14 @@ public class SpeciesData {;
     }
 
     private void addAbstractToSpecies(Resource resource) {
-        resource.addProperty(ResourceFactory.createProperty("http://dbpedia.org/ontology/abstract"), getDescription());
+        if(null == description){
+            resource.addProperty(ResourceFactory.createProperty("http://dbpedia.org/ontology/abstract"), 
+                    "No abstract found");
+        }
+        else{
+            resource.addProperty(ResourceFactory.createProperty("http://dbpedia.org/ontology/abstract"), 
+                    description);
+        }
     }
 
     /* BEGIN: Getter and Setter */

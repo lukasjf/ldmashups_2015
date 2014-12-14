@@ -37,8 +37,8 @@ public class OccurrenceData {
         Resource taxon = model.createResource(species.getEntityURI());
         taxon.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/scientificName"), 
                 ResourceFactory.createTypedLiteral(species.getScientificName(),XSDDatatype.XSDstring));
-        taxon.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/binomial"), 
-                ResourceFactory.createTypedLiteral(species.getBinomial(),XSDDatatype.XSDstring));
+        taxon.addProperty(ResourceFactory.createProperty("http://dbpedia.org/property/binomial"), 
+                species.getBinomial());
     }
     
     private void addTimePropertiesToOccurrence(Resource resource) {

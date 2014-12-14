@@ -3,7 +3,6 @@ package de.uni_potsdam.hpi;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URI;
 
 import de.uni_potsdam.hpi.data.GbifParser;
 import de.uni_potsdam.hpi.data.SpeciesData;
@@ -11,6 +10,7 @@ import de.uni_potsdam.hpi.services.DBpediaService;
 import de.uni_potsdam.hpi.services.FreebaseService;
 import de.uni_potsdam.hpi.services.GbifService;
 
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -55,44 +55,43 @@ public class QueryEndpoint {
     }
 
     @GET
-    @Path("occurrences")
-    public Response getCoordinates(@QueryParam("longitude") double longitude, @QueryParam("latitude") double latitude) {
-        URI targetURIForRedirection = URI.create("localhost:9998?longitude1="+longitude+"&longitude2="+longitude+
-                "&latitude1="+latitude+"&latitude2="+latitude);
-        return Response.seeOther(targetURIForRedirection).build();
-    }
-    
-    @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("occurrences")
-    public Response getCoordinates
-        (@QueryParam("longitude1") double longitude1, @QueryParam("longitude2") double longitude2, 
-                @QueryParam("latitude1") double latitude1, @QueryParam("latitude2") double latitude2) {
-        ResultSet results = getOccurrencesInRange(latitude1, latitude2, longitude1, longitude2);
-        JSONArray output = new JSONArray();
-        while (results.hasNext()){
-            QuerySolution answer =  results.next();
-            addSpeciesDataToOccurrence(answer.get("species"));
-            QuerySolution sol = getOutputInformation(answer.get("occurrence"));
-            output.put(addOccurenceToJSON(sol));
-        }
-        
-        try {
-            FileWriter fw;
-            fw = new FileWriter(new File(DATA_PATH));
-            model.write(fw, "TURTLE");
-            fw.close();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
+    public Response getCoordinates(@QueryParam("longitude") double longitude, @QueryParam("latitude") double latitude,
+            @DefaultValue("0.016")@QueryParam("distance") double distance) {
+        try{
+            ResultSet results = getOccurrencesInRange(latitude - distance, latitude + distance, 
+                    longitude - distance, longitude + distance);
+            JSONArray output = new JSONArray();
+            while (results.hasNext()){
+                QuerySolution answer =  results.next();
+                addSpeciesDataToOccurrence(answer.get("species"));
+                QuerySolution sol = getOutputInformation(answer.get("occurrence"));
+                output.put(addOccurenceToJSON(sol));
+            }
+            
+            try {
+                FileWriter fw;
+                fw = new FileWriter(new File(DATA_PATH));
+                model.write(fw, "TURTLE");
+                fw.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            
+            Response response = Response
+                .ok(output.toString())
+                .header("Access-Control-Allow-Origin", "http://localhost:63342")
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+            return response;
+        } catch(Exception e){
             e.printStackTrace();
         }
-        Response response = Response
-            .ok(output.toString())
-            .header("Access-Control-Allow-Origin", "http://localhost:63342")
-            .type(MediaType.APPLICATION_JSON)
-            .build();
-        return response;
+        return null;
     }
+    
+    
     
     private JSONObject addOccurenceToJSON(QuerySolution sol) {
         JSONObject occurrence = new JSONObject();
@@ -100,6 +99,8 @@ public class QueryEndpoint {
         occurrence.put("latitude", sol.get("latitude"));
         occurrence.put("thumbnailURL", sol.get("thumbnailURL"));
         occurrence.put("abstract", sol.get("abstract"));
+        occurrence.put("binomial", sol.get("binomial"));
+        occurrence.put("scientificName", sol.get("scientificName"));
         return occurrence;
     }
 
@@ -108,8 +109,10 @@ public class QueryEndpoint {
                 "<"+occurence.toString()+">"+ "<http://rs.tdwg.org/dwc/terms/decimalLatitude> ?latitude ."+
                 "<"+occurence.toString()+">"+ "<http://rs.tdwg.org/dwc/terms/decimalLongitude> ?longitude ."+
                 "<"+occurence.toString()+">"+ "<http://rs.tdwg.org/dwc/terms/associatedTaxa> ?species ."+
-                "?species <http://dbpedia.org/ontology/abstract> ?abstract ."+
-                "?species <http://dbpedia.org/ontology/thumbnail> ?thumbnail .";
+                "OPTIONAL{?species <http://dbpedia.org/ontology/abstract> ?abstract .}"+
+                "OPTIONAL{?species <http://dbpedia.org/ontology/thumbnail> ?thumbnailURL .}"+
+                "?species <http://rs.tdwg.org/dwc/terms/scientificName> ?scientificName ."+
+                "?species <http://dbpedia.org/property/binomial> ?binomial}";
         Query query = QueryFactory.create(occurrenceQuery);
         QueryExecution qexec = QueryExecutionFactory
           .create(query, getModel());
@@ -148,7 +151,7 @@ public class QueryEndpoint {
     private SpeciesData getSpecies(RDFNode species) {
         String queryString = "SELECT ?binomial ?scientificName WHERE {"+
                 "<"+species.toString()+">" + " <http://rs.tdwg.org/dwc/terms/scientificName> ?scientificName ."+
-                "<"+species.toString()+">" + " <http://rs.tdwg.org/dwc/terms/binomial> ?binomial}";
+                "<"+species.toString()+">" + " <http://dbpedia.org/property/binomial> ?binomial}";
         Query query = QueryFactory.create(queryString);
         QueryExecution qexec = QueryExecutionFactory
           .create(query, model);

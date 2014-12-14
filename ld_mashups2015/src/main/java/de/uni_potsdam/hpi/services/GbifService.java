@@ -4,7 +4,6 @@ import com.hp.hpl.jena.query.*;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.util.FileManager;
 
-import de.uni_potsdam.hpi.data.GbifParser;
 import de.uni_potsdam.hpi.data.OccurrenceData;
 import de.uni_potsdam.hpi.data.SpeciesData;
 
