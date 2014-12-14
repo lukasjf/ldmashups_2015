@@ -70,6 +70,12 @@ public class Occurrence {
         occurrenceJSON.put("thumbnailURL",
                 occurrence.getSpecies().getThumbnailURL()
         );
+        occurrenceJSON.put("binomial",
+                occurrence.getSpecies().getBinomial()
+        );
+        occurrenceJSON.put("scientificName",
+                occurrence.getSpecies().getScientificName()
+        );
         return occurrenceJSON;
     }
 

@@ -94,7 +94,14 @@
                            return feature;
                        });
                if (feature) {
-                   window.location = feature.get('name');
+                   var images = "";
+                   for (var i = 0; i < feature.get('data')['occurrenceInfo'].length; i++) {
+                       var occ = feature.get('data')['occurrenceInfo'][i];
+                       images = images + '<br/><a href="/api/species?species=' + occ['binomial'] +
+                            '&scientificName=' + occ['scientificName'] + '">' +
+                            '<img src="' + occ['thumbnailURL']  + '"/></a>';
+                   }
+                   document.getElementById('abstract').innerHTML = images;
                }
            });
            map.addOverlay(popup);
@@ -115,22 +122,19 @@
 
         function addFeaturesFor(data) {
             var features = [];
-            //var occurrences = new Set(data);
-            var images = "";
             var locationData = [];
             for (var i = 0; i < data.length; i++) {
                 if (locationData[[data[i]['longitude'],data[i]['latitude']]]) {
-                    locationData[[data[i]['longitude'],data[i]['latitude']]]['thumbnailURLs'].push(data[i]["thumbnailURL"]);
+                    locationData[[data[i]['longitude'],data[i]['latitude']]]['occurrenceInfo'].push(data[i]);
                 } else {
                     locationData[[data[i]['longitude'],data[i]['latitude']]] = {
                         geolocation: {
                             longitude: data[i]["longitude"],
                             latitude: data[i]["latitude"]
                         },
-                        thumbnailURLs: [data[i]["thumbnailURL"]]
+                        occurrenceInfo: [data[i]]
                     };
                 }
-                images = images + '<br/><img src="' + data[i]["thumbnailURL"] + '"></img>';
             }
 
             var iconStyle = new ol.style.Style({
@@ -144,11 +148,11 @@
                 }))
             });
 
-            document.getElementById("abstract").innerHTML = images;
             for (var i = 0; i < Object.keys(locationData).length; i++) {
                 var occ = locationData[Object.keys(locationData)[i]];
                 var feature = new ol.Feature({
-                    name: 'http://localhost:9998/api/species?species=Corvus%20cornix&scientificName=Corvus%20cornix%20Linnaeus,%201758',
+                    data:  occ,
+                    name: [occ['geolocation']['longitude'],occ['geolocation']['latitude']],
                     geometry: new ol.geom.Point(ol.proj.transform(
                             [occ['geolocation']['longitude'],
                              occ['geolocation']['latitude']],
