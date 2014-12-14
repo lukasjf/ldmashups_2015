@@ -37,7 +37,7 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 public class QueryEndpoint {
     
     private static Model model;
-    private static String DATA_PATH = "resource/rdf/data.ttl";
+    private static String DATA_PATH = "resource/rdf/data.rdf";
     
     private static Model getModel(){
         if (null == model){
@@ -46,7 +46,7 @@ public class QueryEndpoint {
                 if (!new File(DATA_PATH).exists()){
                     new File(DATA_PATH).createNewFile();
                 }
-                model.read(DATA_PATH);
+                model.read(DATA_PATH ,"RDF/XML");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -73,7 +73,7 @@ public class QueryEndpoint {
             try {
                 FileWriter fw;
                 fw = new FileWriter(new File(DATA_PATH));
-                model.write(fw, "TURTLE");
+                model.write(fw,"RDF/XML");
                 fw.close();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -95,17 +95,17 @@ public class QueryEndpoint {
     
     private JSONObject addOccurenceToJSON(QuerySolution sol) {
         JSONObject occurrence = new JSONObject();
-        occurrence.put("longitude", sol.get("longitude"));
-        occurrence.put("latitude", sol.get("latitude"));
-        occurrence.put("thumbnailURL", sol.get("thumbnailURL"));
-        occurrence.put("abstract", sol.get("abstract"));
-        occurrence.put("binomial", sol.get("binomial"));
-        occurrence.put("scientificName", sol.get("scientificName"));
+        occurrence.put("longitude", sol.get("longitude").asLiteral().getDouble());
+        occurrence.put("latitude", sol.get("latitude").asLiteral().getDouble());
+        occurrence.put("thumbnailURL", sol.get("thumbnailURL").asLiteral().getString());
+        occurrence.put("abstract", sol.get("abstract").asLiteral().getString());
+        occurrence.put("binomial", sol.get("binomial").asLiteral().getString());
+        occurrence.put("scientificName", sol.get("scientificName").asLiteral().getString());
         return occurrence;
     }
 
     private QuerySolution getOutputInformation(RDFNode occurence) {
-        String occurrenceQuery = "Select ?latitude ?longitude ?abstract ?thumbnailURL where{"+
+        String occurrenceQuery = "Select ?latitude ?longitude ?abstract ?thumbnailURL ?binomial ?scientificName where{"+
                 "<"+occurence.toString()+">"+ "<http://rs.tdwg.org/dwc/terms/decimalLatitude> ?latitude ."+
                 "<"+occurence.toString()+">"+ "<http://rs.tdwg.org/dwc/terms/decimalLongitude> ?longitude ."+
                 "<"+occurence.toString()+">"+ "<http://rs.tdwg.org/dwc/terms/associatedTaxa> ?species ."+
