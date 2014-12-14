@@ -111,7 +111,6 @@ public class Occurrence {
                 "<body>\n");
         for (OccurrenceData occurrence : occurrences){
             db.includeDataFromDBpedia(occurrence.getSpecies());
-            occurrence.encodeOccurrenceInRDF();
             double latitude = Double.parseDouble(occurrence.getLatitude());
             double longitude = Double.parseDouble(occurrence.getLongitude());
             sb.append("<h1>" + occurrence.getSpecies().getScientificName() + "</h1>" +

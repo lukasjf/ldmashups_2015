@@ -1,14 +1,10 @@
 package de.uni_potsdam.hpi.data;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
+import com.hp.hpl.jena.datatypes.xsd.impl.XSDDateType;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 
 public class OccurrenceData {
     public static final String FILE_URL = "resource/rdf/occurrence.rdf";
@@ -18,37 +14,31 @@ public class OccurrenceData {
     private SpeciesData species;
     private String basisOfRecord;
     private String entityURI;
+    private String occurrenceID;
     private String year;
     private String month;
     private String day;
 
     /* RDF Encoding */
-    public void encodeOccurrenceInRDF(){
-        Model model = ModelFactory.createDefaultModel();
+    public void encodeOccurrenceInRDF(Model model){
         Resource resource = model.createResource(getEntityURI());
+        resource.addProperty(ResourceFactory.createProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
+                ResourceFactory.createResource("http://rs.tdwg.org/dwc/terms/Occurrence"));
+        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/occurrenceID"),
+                ResourceFactory.createTypedLiteral(occurrenceID, XSDDateType.XSDint));
         addCoordinatePropertiesToOccurrence(resource);
         addTimePropertiesToOccurrence(resource);
-        addSpeciesToOccurrence(resource);
-        model.write(System.out, "TURTLE");
-        writeRdfToFile(model);
-    }
-
-    
-    private void writeRdfToFile(Model model) {
-        File f = new File(FILE_URL);
-        try {
-            f.createNewFile();
-            FileWriter fw = new FileWriter(f);
-            model.write(fw, "RDF/XML-ABBREV");
-        } catch (IOException e) {
-            System.err.println("Could not write File");
-            e.printStackTrace();
-        }
+        addSpeciesToOccurrence(resource, model);
     }
     
-    private void addSpeciesToOccurrence(Resource resource) {
+    private void addSpeciesToOccurrence(Resource resource, Model model) {
         resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/associatedTaxa"),
                 ResourceFactory.createResource(species.getEntityURI()));
+        Resource taxon = model.createResource(species.getEntityURI());
+        taxon.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/scientificName"), 
+                ResourceFactory.createTypedLiteral(species.getScientificName(),XSDDatatype.XSDstring));
+        taxon.addProperty(ResourceFactory.createProperty("http://dbpedia.org/property/binomial"), 
+                species.getBinomial());
     }
     
     private void addTimePropertiesToOccurrence(Resource resource) {
@@ -65,8 +55,8 @@ public class OccurrenceData {
                 ResourceFactory.createTypedLiteral(latitude, XSDDatatype.XSDdouble));
         resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/decimalLongitude"),
                 ResourceFactory.createTypedLiteral(longitude, XSDDatatype.XSDdouble));
-        resource.addProperty(
-                ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/geodeticDatum"), geodeticDatum);
+        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/geodeticDatum"), 
+                ResourceFactory.createTypedLiteral(geodeticDatum, XSDDatatype.XSDstring));
     }
 
     /* BEGIN: Getter and Setter */
@@ -125,4 +115,14 @@ public class OccurrenceData {
         this.entityURI = entityURI;
     }
     /* END: Getter and Setter */
+
+
+    public String getOccurrenceID() {
+        return occurrenceID;
+    }
+
+
+    public void setOccurrenceID(String occurrenceID) {
+        this.occurrenceID = occurrenceID;
+    }
 }
