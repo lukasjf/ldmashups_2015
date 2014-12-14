@@ -4,6 +4,7 @@ import com.hp.hpl.jena.query.*;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.util.FileManager;
 
+import de.uni_potsdam.hpi.data.GbifParser;
 import de.uni_potsdam.hpi.data.OccurrenceData;
 import de.uni_potsdam.hpi.data.SpeciesData;
 
@@ -30,6 +31,28 @@ public class GbifService {
     private boolean locationIsValid(double latitude1, double latitude2, double longitude1, double longitude2) {
         return (latitude1 <= 90.0 && latitude2 <= 90.0 && latitude1 >= -90.0 && latitude2 >= -90.0 &&
                 longitude1 <= 180 && longitude2 <= 180 && longitude1 >= -180 && longitude2 >= -180);
+    }
+    
+    public JSONArray getOccurrenceForRange
+        (double latitude1, double latitude2, double longitude1, double longitude2){
+            if (!locationIsValid(latitude1, latitude2, longitude1, longitude2)) {
+                System.err.println("Invalid Location");
+                return null;
+            }
+            URL url = null;
+            try {
+                url = new URL(occurenceApiString + "search?decimalLongitude=" + longitude1+ "," + longitude2 + 
+                        "&" + "decimalLatitude=" + latitude1 + "," + latitude2);
+                HttpURLConnection occurrenceClient = (HttpURLConnection)url.openConnection();
+                occurrenceClient.setRequestMethod("GET");
+                JSONObject response = getResponse(occurrenceClient);
+                JSONArray occurrences = response.getJSONArray("results");
+                return occurrences;
+            }
+            catch(Exception e){
+                
+            }
+            return null;
     }
     
     public List<OccurrenceData> getOccurenceForLocation

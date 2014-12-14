@@ -54,7 +54,7 @@ public class FreebaseService {
 
     private List<String> findImageUrlsByMid(String mid) {
         if (null == mid) {
-            return null;
+            return new LinkedList<String>();
         }
         try {
             JSONObject result = findTopicInformationByMid(mid);
@@ -71,7 +71,7 @@ public class FreebaseService {
             System.err.println("Could not parse result from Freebase");
             e.printStackTrace();
         }
-        return null;
+        return new LinkedList<String>();
     }
 
     private JSONObject findTopicInformationByMid(String mid) {
