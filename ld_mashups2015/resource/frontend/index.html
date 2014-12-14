@@ -24,6 +24,7 @@
     <script src="http://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.3/fastclick.js"></script>
     <script language="JavaScript" type="text/javascript">
         var map;
+        var lastSearchResults;
 
         function getRendererFromQueryString() {
             var obj = {}, queryString = location.search.slice(1),
@@ -39,7 +40,7 @@
             } else {
                 return undefined;
             }
-        };
+        }
 
        function loadMap() {
 
@@ -93,7 +94,14 @@
                            return feature;
                        });
                if (feature) {
-                   window.location = feature.get('name');
+                   var images = "";
+                   for (var i = 0; i < feature.get('data')['occurrenceInfo'].length; i++) {
+                       var occ = feature.get('data')['occurrenceInfo'][i];
+                       images = images + '<br/><a href="/api/species?species=' + occ['binomial'] +
+                            '&scientificName=' + occ['scientificName'] + '">' +
+                            '<img src="' + occ['thumbnailURL']  + '"/></a>';
+                   }
+                   document.getElementById('abstract').innerHTML = images;
                }
            });
            map.addOverlay(popup);
@@ -114,31 +122,47 @@
 
         function addFeaturesFor(data) {
             var features = [];
-            //var occurrences = new Set(data);
-            var images = "";
+            var locationData = [];
             for (var i = 0; i < data.length; i++) {
-                images = images + '<br/><img src="' + data[i]["thumbnailURL"] + '"></img>';
+                if (locationData[[data[i]['longitude'],data[i]['latitude']]]) {
+                    locationData[[data[i]['longitude'],data[i]['latitude']]]['occurrenceInfo'].push(data[i]);
+                } else {
+                    locationData[[data[i]['longitude'],data[i]['latitude']]] = {
+                        geolocation: {
+                            longitude: data[i]["longitude"],
+                            latitude: data[i]["latitude"]
+                        },
+                        occurrenceInfo: [data[i]]
+                    };
+                }
             }
-            document.getElementById("abstract").innerHTML = images;
-            var occurrence = data[0];
+
             var iconStyle = new ol.style.Style({
                 image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
                     anchor: [0.5, 0.5],
                     anchorXUnits: 'fraction',
                     anchorYUnits: 'fraction',
                     opacity: 0.75,
-                    src: occurrence["thumbnailURL"]
+                    //src: occurrence["thumbnailURL"]
+                    src: "pics/icon.png"
                 }))
             });
-            var feature = new ol.Feature({
-                name: 'http://localhost:9998/species?species=Corvus%20cornix&scientificName=Corvus%20cornix%20Linnaeus,%201758',
-                geometry: new ol.geom.Point(ol.proj.transform([occurrence['longitude'], occurrence['latitude']],
-                        'EPSG:4326', 'EPSG:3857'))
-            });
-            feature.setStyle(iconStyle);
-            features.push(feature);
-            var vectorSource = new ol.source.Vector({features: features
-            });
+
+            for (var i = 0; i < Object.keys(locationData).length; i++) {
+                var occ = locationData[Object.keys(locationData)[i]];
+                var feature = new ol.Feature({
+                    data:  occ,
+                    name: [occ['geolocation']['longitude'],occ['geolocation']['latitude']],
+                    geometry: new ol.geom.Point(ol.proj.transform(
+                            [occ['geolocation']['longitude'],
+                             occ['geolocation']['latitude']],
+                            'EPSG:4326', 'EPSG:3857'))
+                });
+
+                feature.setStyle(iconStyle);
+                features.push(feature);
+            }
+            var vectorSource = new ol.source.Vector({features: features});
             var vectorLayer = new ol.layer.Vector({source: vectorSource});
             map.addLayer(vectorLayer);
         }
@@ -160,7 +184,7 @@
 
             successHandler:function(responseText, status, xhr, form) {
                 $.ajax({
-                    'url' : 'http://localhost:9998/occurrences',
+                    'url' : 'http://localhost:9998/api/occurrences',
                     'type' : 'GET',
                     'data' : {
                         'longitude' : longitude,
@@ -168,6 +192,7 @@
                     },
 
                     'success' : function(data) {
+                        lastSearchresults = data;
                         addFeaturesFor(data);
                     }
 
