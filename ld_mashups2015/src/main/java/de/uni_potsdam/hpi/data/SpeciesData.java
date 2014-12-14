@@ -70,12 +70,11 @@ public class SpeciesData {;
     }
 
     private void addMediaToSpecies(Resource resource) {
-        Property media = ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/associatedMedia");
         if (null != thumbnailURL) {
-            resource.addProperty(media, thumbnailURL);
+            resource.addProperty(ResourceFactory.createProperty("http://dbpedia.org/ontology/thumbnail"), thumbnailURL);
         }
         for (String url : imageUrls) {
-            resource.addProperty(media, url);
+            resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/associatedMedia"), url);
         }
     }
 

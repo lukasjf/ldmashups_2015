@@ -43,7 +43,7 @@ public class GbifParser {
         occurrence.setDay(""+ result.getInt("day"));
         occurrence.setGeodeticDatum(""+ result.get("geodeticDatum"));
         occurrence.setSpecies(new SpeciesData(result.getString("scientificName"),result.getString("species")));
-        occurrence.getSpecies().setEntityURI("http://www.gbif.org/species/" + result.getInt("key"));
+        occurrence.getSpecies().setEntityURI("http://www.gbif.org/species/" + result.getInt("speciesKey"));
         return occurrence;
     }
 }

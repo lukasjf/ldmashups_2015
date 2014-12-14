@@ -64,30 +64,20 @@ public class QueryEndpoint {
     public String getCoordinates
         (@QueryParam("longitude1") double longitude1, @QueryParam("longitude2") double longitude2, 
                 @QueryParam("latitude1") double latitude1, @QueryParam("latitude2") double latitude2) {
-        GbifService gbif = new GbifService();
-        new GbifParser().parseData
-            (gbif.getOccurrenceForRange(latitude1, latitude2, longitude1, longitude2), getModel());       
-
-        String occurrenceQuery = "Select ?occurrence ?latitude ?species where{"+
-                "?occurrence <http://rs.tdwg.org/dwc/terms/decimalLatitude> ?latitude ."+
-                "?occurrence <http://rs.tdwg.org/dwc/terms/decimalLatitude> ?longitude ."+
-                "?occurence <http://rs.tdwg.org/dwc/terms/associatedTaxa> ?species ."+
-                "FILTER(?latitude >= "+latitude1+") ."+
-                "FILTER(?latitude <= "+latitude2+") ."+
-                "FILTER(?longitude >= "+longitude1+") ."+
-                "FILTER(?longitude <= "+longitude2+") .}";
-        Query query = QueryFactory.create(occurrenceQuery);
-        QueryExecution qexec = QueryExecutionFactory
-          .create(query, getModel());
-        ResultSet results = qexec.execSelect();
+        ResultSet results = getOccurrencesInRange(latitude1, latitude2, longitude1, longitude2);
+        StringBuilder sb = new StringBuilder();
+        sb.append("<!DOCTYPE html>\n" +
+              "<html>\n" +
+              "<head lang=\"en\">\n" +
+              "    <meta charset=\"UTF-8\">\n" +
+              "    <title>Occurence</title>\n" +
+              "</head>\n" +
+              "<body>\n");
         while (results.hasNext()){
             QuerySolution answer =  results.next();
-            if (!isSpeciesStored(answer.get("?species"))){
-                SpeciesData species = getSpecies(answer.get("species"));
-                new DBpediaService().includeDataFromDBpedia(species);
-                new FreebaseService().includeDataFromFreebase(species);
-                species.encodeSpeciesInRDF(getModel());
-            }
+            addSpeciesDataToOccurrence(answer.get("species"));
+            QuerySolution sol = getOutputInformation(answer.get("occurrence"));             
+            // inside is all relevant information
         }
         
         try {
@@ -99,38 +89,51 @@ public class QueryEndpoint {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
-//        StringBuilder sb = new StringBuilder();
-//        sb.append("<!DOCTYPE html>\n" +
-//                "<html>\n" +
-//                "<head lang=\"en\">\n" +
-//                "    <meta charset=\"UTF-8\">\n" +
-//                "    <title>Occurence</title>\n" +
-//                "</head>\n" +
-//                "<body>\n");
-//        for (OccurrenceData occurrence : occurences){
-//            db.includeDataFromDBpedia(occurrence.getSpecies());
-//            double latitude = Double.parseDouble(occurrence.getLatitude());
-//            double longitude = Double.parseDouble(occurrence.getLongitude());
-//            sb.append("<h1>" + occurrence.getSpecies().getScientificName() + "</h1>" +
-//                "<img src=\"" + occurrence.getSpecies().getThumbnailURL() + "\"/>"+
-//                "\n" + "<p>"+ occurrence.getSpecies().getDescription() +"</p>" +
-//                "<a href=\"http://localhost:9998/species?species="+occurrence.getSpecies().getBinomial()
-//                    +"&scientificName="+occurrence.getSpecies().getScientificName()+"\">Get To Animal Overview</a>");
-////                "<h2>Map</h2>" +
-////                "<iframe width=\"425\" height=\"350\" frameborder=\"0\" scrolling=\"no\" marginheight=\"0\" marginwidth=\"0\" " +
-////                "src=\"http://www.openstreetmap.org/export/embed.html?bbox=" + (longitude - 0.5) + "%2C" +
-////                (latitude - 0.5) + "%2C" + (longitude + 0.5) + "%2C" + (latitude + 0.5) + "&amp;layer=mapnik&amp;marker=" + latitude + "%2C" +longitude + ";marker=" + (latitude+0.5) + "%2C" +longitude+(0.5) + "\"" +
-////                " style=\"border: 1px solid black\"></iframe>");             
-//        }
-////        sb.append("<small>" +
-////                "<a href=\"http://www.openstreetmap.org/?mlat=" + latitude1 +"&amp;mlon=" + longitude1 + "#map=10/" + latitude2 + "/" + latitude2 + "\">Größere Karte anzeigen</a></small>" +
-////                "</small>");
-//        
-//        return sb.toString();
         return "";
     }
     
+    private QuerySolution getOutputInformation(RDFNode occurence) {
+        String occurrenceQuery = "Select ?occurrence ?latitude ?longitude ?abstract ?thumbnail where{"+
+                "<"+occurence.toString()+">"+ "<http://rs.tdwg.org/dwc/terms/decimalLatitude> ?latitude ."+
+                "<"+occurence.toString()+">"+ "<http://rs.tdwg.org/dwc/terms/decimalLongitude> ?longitude ."+
+                "<"+occurence.toString()+">"+ "<http://rs.tdwg.org/dwc/terms/associatedTaxa> ?species ."+
+                "?species <http://dbpedia.org/ontology/abstract> ?abstract ."+
+                "?species <http://dbpedia.org/ontology/thumbnail> ?thumbnail .";
+        Query query = QueryFactory.create(occurrenceQuery);
+        QueryExecution qexec = QueryExecutionFactory
+          .create(query, getModel());
+        return qexec.execSelect().next();
+    }
+
+    private void addSpeciesDataToOccurrence(RDFNode speciesID) {
+        if (!isSpeciesStored(speciesID)){
+            SpeciesData species = getSpecies(speciesID);
+            new DBpediaService().includeDataFromDBpedia(species);
+            new FreebaseService().includeDataFromFreebase(species);
+            species.encodeSpeciesInRDF(getModel());
+        }
+    }
+
+    private ResultSet getOccurrencesInRange(double latitude1, double latitude2,
+            double longitude1, double longitude2) {
+        GbifService gbif = new GbifService();
+        new GbifParser().parseData
+            (gbif.getOccurrenceForRange(latitude1, latitude2, longitude1, longitude2), getModel());       
+
+        String occurrenceQuery = "Select ?occurrence ?latitude ?longitude ?species where{"+
+                "?occurrence <http://rs.tdwg.org/dwc/terms/decimalLatitude> ?latitude ."+
+                "?occurrence <http://rs.tdwg.org/dwc/terms/decimalLongitude> ?longitude ."+
+                "?occurence <http://rs.tdwg.org/dwc/terms/associatedTaxa> ?species ."+
+                "FILTER(?latitude >= "+latitude1+") ."+
+                "FILTER(?latitude <= "+latitude2+") ."+
+                "FILTER(?longitude >= "+longitude1+") ."+
+                "FILTER(?longitude <= "+longitude2+") .}";
+        Query query = QueryFactory.create(occurrenceQuery);
+        QueryExecution qexec = QueryExecutionFactory
+          .create(query, getModel());
+        return qexec.execSelect();
+    }
+
     private SpeciesData getSpecies(RDFNode species) {
         String queryString = "SELECT ?binomial ?scientificName WHERE {"+
                 "<"+species.toString()+">" + " <http://rs.tdwg.org/dwc/terms/scientificName> ?scientificName ."+
