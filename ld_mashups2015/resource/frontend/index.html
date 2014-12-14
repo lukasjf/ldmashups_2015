@@ -3,24 +3,212 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title>Occurrence</title>
-</head>
-<body>
-    <script language="JavaScript" type="text/javascript">
-        function loadMap() {
-            var map = document.getElementsByTagName('iframe')[0];
-            map.setAttribute("width", window.screen.availWidth);
-            map.setAttribute("height", window.screen.availHeight);
+
+    <style type="text/css">
+        html, body, .map {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
         }
+    </style>
+    <link rel="stylesheet" href="http://openlayers.org/en/master/resources/bootstrap/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="http://openlayers.org/en/master/resources/bootstrap/css/bootstrap-responsive.min.css" type="text/css">
+    </head>
+</head>
+<body onload="loadMap()">
+    <script src="http://openlayers.org/en/master/resources/jquery.min.js"></script>
+    <script src="lib/jquery.form.min.js"></script>
+    <script src="http://openlayers.org/en/v3.0.0/build/ol.js"></script>
+    <script src="http://openlayers.org/en/master/resources/bootstrap/js/bootstrap.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.3/fastclick.js"></script>
+    <script language="JavaScript" type="text/javascript">
+        var map;
+
+        function getRendererFromQueryString() {
+            var obj = {}, queryString = location.search.slice(1),
+                    re = /([^&=]+)=([^&]*)/g, m;
+
+            while (m = re.exec(queryString)) {
+                obj[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
+            }
+            if ('renderers' in obj) {
+                return obj['renderers'].split(',');
+            } else if ('renderer' in obj) {
+                return [obj['renderer']];
+            } else {
+                return undefined;
+            }
+        };
+
+       function loadMap() {
+
+           var rasterLayer =
+                   new ol.layer.Tile({
+                       source: new ol.source.OSM()
+                   });
+
+           var view = new ol.View({
+               center: [0, 0],
+               zoom: 2
+           });
+
+           var geolocation = new ol.Geolocation({
+               projection: view.getProjection(),
+               tracking: true
+           });
+
+           map = new ol.Map({
+               layers: [rasterLayer],
+               target: document.getElementById('mapdiv'),
+               view: view
+           });
+
+           var accuracyFeature = new ol.Feature({name: 'You are here!'});
+           accuracyFeature.bindTo('geometry', geolocation, 'accuracyGeometry');
+
+           var positionFeature = new ol.Feature({name: 'You are here!'});
+           positionFeature.bindTo('geometry', geolocation, 'position')
+                   .transform(function() {}, function(coordinates) {
+                       return coordinates ? new ol.geom.Point(coordinates) : null;
+                   });
+
+           var featuresOverlay = new ol.FeatureOverlay({
+               map: map,
+               features: [accuracyFeature, positionFeature]
+           });
+
+           var element = document.getElementById('popup');
+
+           var popup = new ol.Overlay({
+               element: element,
+               positioning: 'bottom-center',
+               stopEvent: false
+           });
+
+           // display popup on click
+           map.on('click', function(evt) {
+               var feature = map.forEachFeatureAtPixel(evt.pixel,
+                       function(feature, layer) {
+                           return feature;
+                       });
+               if (feature) {
+                   window.location = feature.get('name');
+               }
+           });
+           map.addOverlay(popup);
+
+            // change mouse cursor when over marker
+           $(map.getViewport()).on('mousemove', function(e) {
+               var pixel = map.getEventPixel(e.originalEvent);
+               var hit = map.forEachFeatureAtPixel(pixel, function(feature, layer) {
+                   return true;
+               });
+               if (hit) {
+                   map.getTarget().style.cursor = 'pointer';
+               } else {
+                   map.getTarget().style.cursor = '';
+               }
+           });
+       }
+
+        function addFeaturesFor(data) {
+            var features = [];
+            //var occurrences = new Set(data);
+            var images = "";
+            for (var i = 0; i < data.length; i++) {
+                images = images + '<br/><img src="' + data[i]["thumbnailURL"] + '"></img>';
+            }
+            document.getElementById("abstract").innerHTML = images;
+            var occurrence = data[0];
+            var iconStyle = new ol.style.Style({
+                image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+                    anchor: [0.5, 0.5],
+                    anchorXUnits: 'fraction',
+                    anchorYUnits: 'fraction',
+                    opacity: 0.75,
+                    src: occurrence["thumbnailURL"]
+                }))
+            });
+            var feature = new ol.Feature({
+                name: 'http://localhost:9998/species?species=Corvus%20cornix&scientificName=Corvus%20cornix%20Linnaeus,%201758',
+                geometry: new ol.geom.Point(ol.proj.transform([occurrence['longitude'], occurrence['latitude']],
+                        'EPSG:4326', 'EPSG:3857'))
+            });
+            feature.setStyle(iconStyle);
+            features.push(feature);
+            var vectorSource = new ol.source.Vector({features: features
+            });
+            var vectorLayer = new ol.layer.Vector({source: vectorSource});
+            map.addLayer(vectorLayer);
+        }
+
+        var SEARCH_AJAX_FORM = {
+            longitude : null,
+            latitude : null,
+
+            beforeSubmitHandler:function(arr, form, options) {
+                $.each(arr, function(index, aField) {
+                    if ('longitude' === aField.name) {
+                        longitude = aField.value;
+                    } else if ('latitude' === aField.name) {
+                        latitude = aField.value;
+                    }
+                })
+                return (longitude && latitude);
+            },
+
+            successHandler:function(responseText, status, xhr, form) {
+                $.ajax({
+                    'url' : 'http://localhost:9998/occurrences',
+                    'type' : 'GET',
+                    'data' : {
+                        'longitude' : longitude,
+                        'latitude' : latitude
+                    },
+
+                    'success' : function(data) {
+                        addFeaturesFor(data);
+                    }
+
+                });
+            },
+
+            initSearchForm:function() {
+                $("#search-form").ajaxForm({
+                    beforeSubmit:this.beforeSubmitHandler,
+                    success:this.successHandler,
+                    clearForm:false
+                })
+            }
+        }
+
+        $(document).ready(function() {
+            SEARCH_AJAX_FORM.initSearchForm();
+        });
+
     </script>
-    <form action="http://localhost:9998/occurrences" method="GET">
-        <label for="longitude">longitude:</label><input name="longitude" type="text" value="13.54983" id="longitude"/>
-        <label for="latitude">latitude:</label><input name="latitude" type="text" value="52.55914" id="latitude"/>
-        <input type="submit"/>
-    </form>
-    <iframe onload="loadMap()" name="mapFrame" width="425" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://www.openstreetmap.org/export/embed.html?bbox=11.976470947265625%2C52.07950600379697%2C13.940277099609373%2C52.80525205752532&amp;layer=mapnik&amp;marker=52.44387349930654%2C12.9583740234375" style="border: 1px solid black">
-    </iframe><br/>
-    <small>
-        <a href="http://www.openstreetmap.org/?mlat=52.4439&amp;mlon=12.9584#map=10/52.4439/12.9584">Größere Karte anzeigen</a>
-    </small>
+    <div id="searchdiv" style="margin-top:50px">
+        <!--<form id="search-form" action="http://localhost:9998/occurrences" method="GET" -->
+        <form id="search-form">
+            <h3 class="panel-title">Taxon-Finder</h3>
+            <div class="panel">
+            <div class="panel-body">
+                <label for="longitude">longitude:</label><input name="longitude" type="text" value="13.54983" id="longitude" style="border-radius:10px; -moz-border-radius:10px; -webkit-border-radius:10px;"/>
+                <label for="latitude">latitude:</label><input name="latitude" type="text" value="52.55914" id="latitude" style="border-radius:10px; -moz-border-radius:10px; -webkit-border-radius:10px;"/>
+            </div>
+            <div class="panel-footer">
+                <input class="btn btn-info" type="submit"/>
+            </div>
+            </div>
+        </form>
+    </div>
+    <div id="mapdiv">
+        <div id="popup"></div>
+    </div>
+    <div id="abstract"></div>
+    <!--<iframe style="margin-top:-25px;" onload="loadMap()" name="mapFrame" width="425" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://www.openstreetmap.org/export/embed.html?bbox=11.976470947265625%2C52.07950600379697%2C13.940277099609373%2C52.80525205752532&amp;layer=mapnik&amp;marker=52.44387349930654%2C12.9583740234375" style="border: 1px solid black">
+    </iframe>-->
+    </div>
 </body>
 </html>

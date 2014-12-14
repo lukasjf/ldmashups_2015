@@ -1,18 +1,16 @@
 package de.uni_potsdam.hpi;
 
-
-import java.net.URI;
 import java.util.List;
 
 import de.uni_potsdam.hpi.data.OccurrenceData;
+import de.uni_potsdam.hpi.data.OccurrenceXML;
 import de.uni_potsdam.hpi.services.DBpediaService;
 import de.uni_potsdam.hpi.services.GbifService;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 // The Java class will be hosted at the URI path "/occurrence"
@@ -21,26 +19,82 @@ public class Occurrence {
 
     // The Java method will process HTTP GET requests
     @GET
-
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getCoordinates(@QueryParam("longitude") double longitude, @QueryParam("latitude") double latitude,
-            @QueryParam("distance")double distance) {
+                                       @DefaultValue("0.016")@QueryParam("distance") double distance) {
         System.out.println(distance);
-//        URI targetURIForRedirection = URI.create("localhost:9998?longitude1="+longitude+"&longitude2="+longitude+
-//                "&latitude1="+latitude+"&latitude2="+latitude);
-//        return Response.temporaryRedirect(targetURIForRedirection).build();
-        return null;
+        GbifService gbif = new GbifService();
+
+        List<OccurrenceData> occurrences = gbif.getOccurenceForLocation(latitude - distance,
+                latitude + distance,
+                longitude - distance,
+                longitude + distance);
+        JSONArray occurrencesJson = getJSONArrayFor(occurrences);
+        DBpediaService dbPedia = new DBpediaService();
+        dbPedia.includeDataFromDBpedia(occurrences.get(0).getSpecies());
+        JSONObject result = new JSONObject();
+        result.put("longitude",
+                Double.parseDouble(occurrences.get(0).getLongitude()));
+        result.put("latitude",
+                Double.parseDouble(occurrences.get(0).getLatitude()));
+        result.put("thumbnailURL",
+                occurrences.get(0).getSpecies().getThumbnailURL()
+                );
+        System.out.println(occurrencesJson);
+        Response response = Response
+                .ok(occurrencesJson.toString())
+                .header("Access-Control-Allow-Origin", "http://localhost:63342")
+                .type(MediaType.APPLICATION_JSON)
+                .build();
+        return response;
     }
-    
-    @GET
+
+    private JSONArray getJSONArrayFor(List<OccurrenceData> occurrences) {
+        JSONArray occurrencesJSON = new JSONArray();
+        for (OccurrenceData occurrence : occurrences) {
+            occurrencesJSON.put(getJSONObjectFor(occurrence));
+        }
+        return occurrencesJSON;
+    }
+
+    private JSONObject getJSONObjectFor(OccurrenceData occurrence) {
+        JSONObject occurrenceJSON = new JSONObject();
+        DBpediaService dBpediaService = new DBpediaService();
+        occurrenceJSON.put("longitude",
+                Double.parseDouble(occurrence.getLongitude()));
+        occurrenceJSON.put("latitude",
+                Double.parseDouble(occurrence.getLatitude()));
+        if (null == occurrence.getSpecies().getThumbnailURL()) {
+            dBpediaService.includeDataFromDBpedia(occurrence.getSpecies());
+        }
+        occurrenceJSON.put("thumbnailURL",
+                occurrence.getSpecies().getThumbnailURL()
+        );
+        return occurrenceJSON;
+    }
+
+    //@GET
     // The Java method will produce content identified by the MIME Media
     // type "text/html"
-    @Produces("text/html")
-    public String getCoordinates
-        (@QueryParam("longitude1") double longitude1, @QueryParam("longitude2") double longitude2, 
-                @QueryParam("latitude1") double latitude1, @QueryParam("latitude2") double latitude2) {
+    //@Produces("text/html")
+   // @Produces(MediaType.APPLICATION_XML)
+    public OccurrenceXML getCoordinates
+            (@QueryParam("longitude1") double longitude1, @QueryParam("longitude2") double longitude2,
+             @QueryParam("latitude1") double latitude1, @QueryParam("latitude2") double latitude2) {
         GbifService gbif = new GbifService();
         DBpediaService db = new DBpediaService();
-        List<OccurrenceData> occurences = gbif.getOccurenceForLocation(latitude1, latitude2, longitude1, longitude2);
+        List<OccurrenceData> occurrences = gbif.getOccurenceForLocation(latitude1, latitude2, longitude1, longitude2);
+        /*OccurrenceXML result = new OccurrenceXML(
+                Double.parseDouble(occurrences.get(0).getLongitude()),
+                Double.parseDouble(occurrences.get(0).getLatitude()),
+                occurrences.get(0).getSpecies().getThumbnailURL()
+            );*/
+        OccurrenceXML result = new OccurrenceXML(
+                13.54983,
+                52.55914,
+                "http://wiki.dbpedia.org/images/dbpedia_logo.png"
+            );
+
         StringBuilder sb = new StringBuilder();
         sb.append("<!DOCTYPE html>\n" +
                 "<html>\n" +
@@ -49,7 +103,7 @@ public class Occurrence {
                 "    <title>Occurence</title>\n" +
                 "</head>\n" +
                 "<body>\n");
-        for (OccurrenceData occurrence : occurences){
+        for (OccurrenceData occurrence : occurrences){
             db.includeDataFromDBpedia(occurrence.getSpecies());
             occurrence.encodeOccurrenceInRDF();
             double latitude = Double.parseDouble(occurrence.getLatitude());
@@ -69,6 +123,8 @@ public class Occurrence {
 //                "<a href=\"http://www.openstreetmap.org/?mlat=" + latitude1 +"&amp;mlon=" + longitude1 + "#map=10/" + latitude2 + "/" + latitude2 + "\">Größere Karte anzeigen</a></small>" +
 //                "</small>");
         
-        return sb.toString();
+        //return sb.toString();
+        //return Response.ok(sb.toString()).header("Access-Control-Allow-Origin", "http://localhost:63342/").build();
+        return result;
     }
 }
