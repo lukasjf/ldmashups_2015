@@ -11,6 +11,18 @@
             width: 100%;
             height: 100%;
         }
+
+        #images {
+            background-color:rgba(0, 0, 0, 0.5);
+            position:fixed;
+            top:0px;
+            left:0px;
+            width:100%;
+            height:100%;
+            color:#FFFFFF;
+            text-align:center;
+            vertical-align:middle;
+        }
     </style>
     <link rel="stylesheet" href="http://openlayers.org/en/master/resources/bootstrap/css/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="http://openlayers.org/en/master/resources/bootstrap/css/bootstrap-responsive.min.css" type="text/css">
@@ -25,6 +37,10 @@
     <script language="JavaScript" type="text/javascript">
         var map;
         var lastSearchResults;
+        function hideImages() {
+            document.getElementById('images').style.display = 'none';
+            document.getElementById('images').innerHTML= '';
+        }
 
         function getRendererFromQueryString() {
             var obj = {}, queryString = location.search.slice(1),
@@ -97,11 +113,14 @@
                    var images = "";
                    for (var i = 0; i < feature.get('data')['occurrenceInfo'].length; i++) {
                        var occ = feature.get('data')['occurrenceInfo'][i];
-                       images = images + '<br/><a href="/api/species?species=' + occ['binomial'] +
+                       images = images + '<a href="/api/species?species=' + occ['binomial'] +
                             '&scientificName=' + occ['scientificName'] + '">' +
                             '<img src="' + occ['thumbnailURL']  + '"/></a>';
                    }
-                   document.getElementById('abstract').innerHTML = images;
+                   images = images;
+                   var imagesElement = document.getElementById('images');
+                   imagesElement.style.display = "";
+                   imagesElement.innerHTML = images;
                }
            });
            map.addOverlay(popup);
@@ -231,7 +250,7 @@
     <div id="mapdiv">
         <div id="popup"></div>
     </div>
-    <div id="abstract"></div>
+    <div id="images" style="display: none;" onclick="hideImages()"></div>
     <!--<iframe style="margin-top:-25px;" onload="loadMap()" name="mapFrame" width="425" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://www.openstreetmap.org/export/embed.html?bbox=11.976470947265625%2C52.07950600379697%2C13.940277099609373%2C52.80525205752532&amp;layer=mapnik&amp;marker=52.44387349930654%2C12.9583740234375" style="border: 1px solid black">
     </iframe>-->
     </div>
