@@ -12,7 +12,7 @@
             height: 100%;
         }
 
-        #images {
+        #images, #searchdiv {
             background-color:rgba(0, 0, 0, 0.5);
             position:fixed;
             top:0px;
@@ -24,22 +24,34 @@
             vertical-align:middle;
         }
     </style>
-    <link rel="stylesheet" href="http://openlayers.org/en/master/resources/bootstrap/css/bootstrap.min.css" type="text/css">
-    <link rel="stylesheet" href="http://openlayers.org/en/master/resources/bootstrap/css/bootstrap-responsive.min.css" type="text/css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
     </head>
 </head>
 <body onload="loadMap()">
     <script src="http://openlayers.org/en/master/resources/jquery.min.js"></script>
     <script src="lib/jquery.form.min.js"></script>
     <script src="http://openlayers.org/en/v3.0.0/build/ol.js"></script>
-    <script src="http://openlayers.org/en/master/resources/bootstrap/js/bootstrap.min.js"></script>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.3/fastclick.js"></script>
     <script language="JavaScript" type="text/javascript">
         var map;
         var lastSearchResults;
-        function hideImages() {
+        function hideDiv() {
+            document.getElementById('searchdiv').style.display = 'none';
             document.getElementById('images').style.display = 'none';
             document.getElementById('images').innerHTML= '';
+        }
+
+        function showSearch() {
+            for (var el = 0;  el < document.getElementById('searchform').getElementsByTagName('label').length; el++) {
+                document.getElementById('searchform').getElementsByTagName('label')[el].style.display="";
+            }
+            for (var el = 0; el < document.getElementById('searchform').getElementsByTagName('input').length; el++) {
+                document.getElementById('searchform').getElementsByTagName('input')[el].style.display="";
+            }
+            //document.getElementById('searchdiv').style.display = '';
         }
 
         function getRendererFromQueryString() {
@@ -162,7 +174,6 @@
                     anchorXUnits: 'fraction',
                     anchorYUnits: 'fraction',
                     opacity: 0.75,
-                    //src: occurrence["thumbnailURL"]
                     src: "pics/icon.png"
                 }))
             });
@@ -219,7 +230,7 @@
             },
 
             initSearchForm:function() {
-                $("#search-form").ajaxForm({
+                $("#searchform").ajaxForm({
                     beforeSubmit:this.beforeSubmitHandler,
                     success:this.successHandler,
                     clearForm:false
@@ -232,27 +243,31 @@
         });
 
     </script>
-    <div id="searchdiv" style="margin-top:50px">
-        <!--<form id="search-form" action="http://localhost:9998/occurrences" method="GET" -->
-        <form id="search-form">
-            <h3 class="panel-title">Taxon-Finder</h3>
-            <div class="panel">
-            <div class="panel-body">
-                <label for="longitude">longitude:</label><input name="longitude" type="text" value="13.54983" id="longitude" style="border-radius:10px; -moz-border-radius:10px; -webkit-border-radius:10px;"/>
-                <label for="latitude">latitude:</label><input name="latitude" type="text" value="52.55914" id="latitude" style="border-radius:10px; -moz-border-radius:10px; -webkit-border-radius:10px;"/>
-            </div>
-            <div class="panel-footer">
-                <input class="btn btn-info" type="submit"/>
-            </div>
-            </div>
+    <div id="title" style="display:flex;">
+        <h3>Taxon-Finder</h3>
+        <form id="searchform" style="position:absolute; top:15px; right:5px">
+            <label for="longitude">longitude:</label><input name="longitude" type="text" value="13.133317" id="longitude" style="border-radius:10px; -moz-border-radius:10px; -webkit-border-radius:10px;"/>
+            <label for="latitude">latitude:</label><input name="latitude" type="text" value="52.394050" id="latitude" style="border-radius:10px; -moz-border-radius:10px; -webkit-border-radius:10px;"/>
+            <button class="btn btn-info" type="submit"><i class="glyphicon glyphicon-search"></i></button>
         </form>
     </div>
     <div id="mapdiv">
         <div id="popup"></div>
     </div>
-    <div id="images" style="display: none;" onclick="hideImages()"></div>
-    <!--<iframe style="margin-top:-25px;" onload="loadMap()" name="mapFrame" width="425" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://www.openstreetmap.org/export/embed.html?bbox=11.976470947265625%2C52.07950600379697%2C13.940277099609373%2C52.80525205752532&amp;layer=mapnik&amp;marker=52.44387349930654%2C12.9583740234375" style="border: 1px solid black">
-    </iframe>-->
+    <div id="searchdiv" style="display:none; margin-top:50px" onclick="hideDiv()">
+    <!--    <form id="search-form">
+            <div class="panel">
+            <div class="panel-body">
+                <label for="longitude">longitude:</label><input name="longitude" type="text" value="13.133317" id="longitude" style="border-radius:10px; -moz-border-radius:10px; -webkit-border-radius:10px;"/>
+                <label for="latitude">latitude:</label><input name="latitude" type="text" value="52.394050" id="latitude" style="border-radius:10px; -moz-border-radius:10px; -webkit-border-radius:10px;"/>
+            </div>
+            <div class="panel-footer">
+                <input class="btn btn-info" type="submit"/>
+            </div>
+            </div>
+        </form>-->
+    </div>
+    <div id="images" style="overflow-y: scroll; display: none;" onclick="hideDiv()"></div>
     </div>
 </body>
 </html>
