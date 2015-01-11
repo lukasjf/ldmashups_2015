@@ -32,14 +32,6 @@
 //        JSONArray occurrencesJson = getJSONArrayFor(occurrences);
 //        DBpediaService dbPedia = new DBpediaService();
 //        dbPedia.includeDataFromDBpedia(occurrences.get(0).getSpecies());
-//        JSONObject result = new JSONObject();
-//        result.put("longitude",
-//                Double.parseDouble(occurrences.get(0).getLongitude()));
-//        result.put("latitude",
-//                Double.parseDouble(occurrences.get(0).getLatitude()));
-//        result.put("thumbnailURL",
-//                occurrences.get(0).getSpecies().getThumbnailURL()
-//                );
 //        System.out.println(occurrencesJson);
 //        Response response = Response
 //                .ok(occurrencesJson.toString())
