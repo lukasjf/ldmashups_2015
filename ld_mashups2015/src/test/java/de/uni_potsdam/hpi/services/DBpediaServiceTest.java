@@ -10,10 +10,12 @@ import de.uni_potsdam.hpi.services.DBpediaService;
 public class DBpediaServiceTest{
 
     SpeciesData parusMajor;
+    SpeciesData blueTit;
     
     @Before
     public void initializeParusMajor(){
         parusMajor = new SpeciesData("Parus major, Linnaeus, 1758", "Parus major");
+        blueTit = new SpeciesData("Parus caeruleus, Linnaeus, 1758", "Parus caeruleus");
     }
     @Test
     public void testIncludeDataFromDBpedia() {
@@ -30,4 +32,11 @@ public class DBpediaServiceTest{
         new DBpediaService().includeDataFromDBpedia(parusMajor);
         assertTrue("did extract wrong information", parusMajor.getDescription().toLowerCase().contains("great tit"));
     }
+    @Test
+    public void testSynonyms() {
+        new DBpediaService().includeDataFromDBpedia(blueTit);
+        assertNotNull("DBPedia resources not found", blueTit.getThumbnailURL());
+        assertFalse("DBPedia resources not found", blueTit.getThumbnailURL().equals(""));
+    }
+
 }

@@ -15,7 +15,8 @@ public class DBpediaService {
     private String queryTemplate = "SELECT ?image ?abstract ?kingdom ?phylum ?family ?animal ?class ?order ?genus " +
             "FROM <http://dbpedia.org> " +
             "WHERE { " +
-            "?animal <http://dbpedia.org/property/binomial> \"%s\"@en . " +
+            "{{ ?animal <http://dbpedia.org/property/binomial> \"%s\"@en } UNION " +
+            "{ ?animal <http://dbpedia.org/property/synonyms> ?name FILTER <http://www.w3.org/2005/xpath-functions/#contains>(?name, \"%s\") }}" +
             "?animal <http://dbpedia.org/ontology/thumbnail> ?image . " +
             "?animal <http://dbpedia.org/ontology/abstract> ?abstract . " +
             "?animal <http://dbpedia.org/ontology/kingdom> ?kingdom ." +
@@ -30,7 +31,7 @@ public class DBpediaService {
 
     // searching for strings does not work yet, nor does it in the online endpoint
 	public void includeDataFromDBpedia(SpeciesData species){
-		String sparqlQueryString = String.format(queryTemplate, species.getBinomial());
+		String sparqlQueryString = String.format(queryTemplate, species.getBinomial(), species.getBinomial());
         Query query = QueryFactory.create(sparqlQueryString);
         QueryExecution qexec = QueryExecutionFactory
           .sparqlService(sparqlEndpoint, query);
