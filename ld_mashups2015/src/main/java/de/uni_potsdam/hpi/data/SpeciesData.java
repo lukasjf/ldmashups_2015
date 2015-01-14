@@ -27,77 +27,20 @@ public class SpeciesData {;
     private String taxonClass;
     private List<String> equivalentWebpages;
     private List<String> imageUrls;
-    private String name;
+    Resource resource;
+	private String name;
 
     public SpeciesData(String scientificName, String binomial) {
         this.scientificName = scientificName;
         this.binomial = binomial;
+        resource = ModelFactory.createDefaultModel().createResource();
     }
 
-    public SpeciesData(String entityURI) {
+    public SpeciesData(Model model, String entityURI) {
         this.entityURI = entityURI;
-    }
-
-    /* BEGIN: RDF encoding */
-
-    public void encodeSpeciesInRDF(Model model){
-        Resource resource = model.createResource(getEntityURI());
-        resource.addProperty(ResourceFactory.createProperty("http://www.w3.org/2002/07/owl#sameAs"),
-                ResourceFactory.createResource(dBpediaURI));
+        resource = model.createResource(getEntityURI());
         resource.addProperty(ResourceFactory.createProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
                 ResourceFactory.createResource("http://rs.tdwg.org/dwc/terms/Taxon"));
-        addNamePropertiesToSpecies(resource);
-        addIdentificationToSpecies(resource);
-        addMediaToSpecies(resource);
-        addTaxonToSpecies(resource);
-        addAbstractToSpecies(resource);
-    }
-
-    private void addTaxonToSpecies(Resource resource) {
-        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/kingdom"),
-                ResourceFactory.createResource(kingdom));
-        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/phylum"),
-                ResourceFactory.createResource(phylum));
-        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/family"),
-                ResourceFactory.createResource(family));
-        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/class"),
-                ResourceFactory.createResource(taxonClass));
-        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/order"),
-                ResourceFactory.createResource(order));
-        resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/genus"),
-                ResourceFactory.createResource(genus));
-    }
-
-    private void addMediaToSpecies(Resource resource) {
-        if (null != thumbnailURL) {
-            resource.addProperty(ResourceFactory.createProperty("http://dbpedia.org/ontology/thumbnail"), thumbnailURL);
-        }
-        for (String url : imageUrls) {
-            resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/associatedMedia"), url);
-        }
-    }
-
-    private void addIdentificationToSpecies(Resource resource) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    private void addNamePropertiesToSpecies(Resource resource) {
-//        resource.addProperty(
-//                ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/binomial"), getScientificName());
-//        resource.addProperty(
-//                ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/scientificName"), getScientificName());
-    }
-
-    private void addAbstractToSpecies(Resource resource) {
-        if(null == description){
-            resource.addProperty(ResourceFactory.createProperty("http://dbpedia.org/ontology/abstract"), 
-                    "No abstract found");
-        }
-        else{
-            resource.addProperty(ResourceFactory.createProperty("http://dbpedia.org/ontology/abstract"), 
-                    description);
-        }
     }
 
     /* BEGIN: Getter and Setter */
@@ -114,7 +57,11 @@ public class SpeciesData {;
     }
 
     public void setScientificName(String scientificName) {
-        this.scientificName = scientificName;
+        if(null != scientificName){
+            this.scientificName = scientificName;
+            resource.addProperty(
+                    ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/scientificName"), getScientificName());
+        }       
     }
 
     public String getThumbnailURL() {
@@ -122,15 +69,31 @@ public class SpeciesData {;
     }
 
     public void setThumbnailURL(String thumbnailURL) {
-        this.thumbnailURL = thumbnailURL;
+        if (null != thumbnailURL) {
+            this.thumbnailURL = thumbnailURL;
+            resource.addProperty(ResourceFactory.createProperty("http://dbpedia.org/ontology/thumbnail"), 
+                    ResourceFactory.createResource(thumbnailURL));
+        }
+        else{
+            resource.addProperty(ResourceFactory.createProperty("http://dbpedia.org/ontology/thumbnail"), "");
+        }
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String Description) {
-        this.description = Description;
+    public void setDescription(String description) {
+        if(null == description){
+            this.description = "No abstract found";
+            resource.addProperty(ResourceFactory.createProperty("http://dbpedia.org/ontology/abstract"), 
+                    "No abstract found");
+        }
+        else{
+            this.description = description;
+            resource.addProperty(ResourceFactory.createProperty("http://dbpedia.org/ontology/abstract"), 
+                    description);
+        }
     }
 
     public List<String> getEquivalentWebpages() {
@@ -152,7 +115,13 @@ public class SpeciesData {;
     }
 
     public void setImageUrls(List<String> imageUrls) {
-        this.imageUrls = imageUrls;
+        if(null != imageUrls){
+            this.imageUrls = imageUrls;
+            for (String url : imageUrls) {
+                resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/associatedMedia"), 
+                        ResourceFactory.createResource(url));
+            }
+        }        
     }
 
     public String getKingdom() {
@@ -160,8 +129,11 @@ public class SpeciesData {;
     }
 
     public void setKingdom(String kingdom) {
-        if (null != kingdom && !kingdom.isEmpty())
+        if (null != kingdom && !kingdom.isEmpty()){
             this.kingdom = kingdom;
+            resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/kingdom"),
+                    ResourceFactory.createResource(kingdom));
+        }
     }
 
     public String getPhylum() {
@@ -169,8 +141,11 @@ public class SpeciesData {;
     }
 
     public void setPhylum(String phylum) {
-        if (null != phylum && !phylum.isEmpty())
+        if (null != phylum && !phylum.isEmpty()){
             this.phylum = phylum;
+            resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/phylum"),
+                    ResourceFactory.createResource(phylum));          
+        }           
     }
 
     public String getFamily() {
@@ -178,7 +153,11 @@ public class SpeciesData {;
     }
 
     public void setFamily(String family) {
-        this.family = family;
+        if(null != family){
+            this.family = family;
+            resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/family"),
+                    ResourceFactory.createResource(family));
+        }       
     }
 
     public String getTaxonClass() {
@@ -186,7 +165,11 @@ public class SpeciesData {;
     }
 
     public void setTaxonClass(String taxonClass) {
-        this.taxonClass = taxonClass;
+        if(null != taxonClass){
+            this.taxonClass = taxonClass;
+            resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/class"),
+                    ResourceFactory.createResource(taxonClass));
+        }       
     }
 
     public String getBinomial() {
@@ -194,7 +177,11 @@ public class SpeciesData {;
     }
 
     public void setBinomial(String binomial) {
-        this.binomial = binomial;
+        if(null != binomial){
+            this.binomial = binomial;
+            resource.addProperty(
+                    ResourceFactory.createProperty("http://dbpedia.org/property/binomial"), binomial);
+        }  
     }
     
     public String getOrder() {
@@ -202,7 +189,11 @@ public class SpeciesData {;
     }
 
     public void setOrder(String order) {
-        this.order = order;
+        if(null != order){
+            this.order = order;
+            resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/order"),
+                ResourceFactory.createResource(order));
+        }
     }
 
     public String getGenus() {
@@ -210,7 +201,11 @@ public class SpeciesData {;
     }
 
     public void setGenus(String genus) {
-        this.genus = genus;
+        if(null != genus){
+            this.genus = genus;
+            resource.addProperty(ResourceFactory.createProperty("http://rs.tdwg.org/dwc/terms/genus"),
+                    ResourceFactory.createResource(genus));          
+        }
     }
 
     public String getdBpediaURI() {
@@ -218,17 +213,11 @@ public class SpeciesData {;
     }
 
     public void setdBpediaURI(String dBpediaURI) {
-        this.dBpediaURI = dBpediaURI;
-    }
-
-    public void setName(String name) {
-        if (name.contains("@")) {
-            this.name = name.replace("@en", "");
-        }
-    }
-
-    public String getName() {
-        return name;
+        if(null != dBpediaURI){
+            this.dBpediaURI = dBpediaURI;
+            resource.addProperty(ResourceFactory.createProperty("http://www.w3.org/2002/07/owl#sameAs"),
+                    ResourceFactory.createResource(dBpediaURI));
+        }       
     }
     
     /* END: Getter and Setter */

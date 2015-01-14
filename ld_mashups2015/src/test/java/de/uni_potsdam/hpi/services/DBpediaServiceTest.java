@@ -21,7 +21,7 @@ public class DBpediaServiceTest{
     public void testIncludeDataFromDBpedia() {
         new DBpediaService().includeDataFromDBpedia(parusMajor);
         assertNotNull("could not extract Thumbnail", parusMajor.getThumbnailURL());
-        assertNotNull("could not extract Descritpion", parusMajor.getDescription());
+        assertNotNull("could not extract Description", parusMajor.getDescription());
         assertNotNull("could not extract Phylum", parusMajor.getPhylum());
         assertNotNull("could not extract Kingdom", parusMajor.getKingdom());
         assertNotNull("could not extract Family", parusMajor.getFamily());
