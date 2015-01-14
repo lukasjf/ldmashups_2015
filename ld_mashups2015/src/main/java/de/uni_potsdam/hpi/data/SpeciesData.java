@@ -27,6 +27,7 @@ public class SpeciesData {;
     private String taxonClass;
     private List<String> equivalentWebpages;
     private List<String> imageUrls;
+    private String name;
 
     public SpeciesData(String scientificName, String binomial) {
         this.scientificName = scientificName;
@@ -218,6 +219,16 @@ public class SpeciesData {;
 
     public void setdBpediaURI(String dBpediaURI) {
         this.dBpediaURI = dBpediaURI;
+    }
+
+    public void setName(String name) {
+        if (name.contains("@")) {
+            this.name = name.replace("@en", "");
+        }
+    }
+
+    public String getName() {
+        return name;
     }
     
     /* END: Getter and Setter */
