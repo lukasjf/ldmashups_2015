@@ -28,6 +28,7 @@ public class SpeciesData {;
     private List<String> equivalentWebpages;
     private List<String> imageUrls;
     Resource resource;
+	private String name;
 
     public SpeciesData(String scientificName, String binomial) {
         this.scientificName = scientificName;
