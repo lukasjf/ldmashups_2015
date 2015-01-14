@@ -8,6 +8,7 @@ import de.uni_potsdam.hpi.data.GbifParser;
 import de.uni_potsdam.hpi.data.SpeciesData;
 import de.uni_potsdam.hpi.services.DBpediaService;
 import de.uni_potsdam.hpi.services.GbifService;
+import de.uni_potsdam.hpi.services.WikimediaService;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -125,7 +126,7 @@ public class QueryEndpoint {
         if (!isSpeciesStored(speciesID)){
             SpeciesData species = getSpecies(speciesID);
             new DBpediaService().includeDataFromDBpedia(species);
-            //new FreebaseService().includeDataFromFreebase(species);
+            new WikimediaService().includeImagesFromWikimedia(species);
         }
     }
 
