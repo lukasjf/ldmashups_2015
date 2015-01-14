@@ -197,4 +197,42 @@ public class QueryEndpoint {
           .create(query, model);
         return qexec.execAsk();
     }
+
+    @GET
+    @Produces("text/html")
+    @Path("species")
+    public String getIt(@QueryParam("species")String binomial, @QueryParam("scientificName")String scientificName) {
+        SpeciesData species = new SpeciesData(scientificName, binomial);
+        DBpediaService db = new DBpediaService();
+        db.includeDataFromDBpedia(species);
+        //FreebaseService fs = new FreebaseService();
+        //fs.includeDataFromFreebase(species);
+        WikimediaService ws = new WikimediaService();
+        ws.includeImagesFromWikimedia(species);
+        StringBuilder sb = new StringBuilder();
+        sb.append("<p>");
+        for (String url : species.getImageUrls()) {
+            sb.append("<img src=\"" + url + "\"/>");
+
+        }
+        sb.append("</p>");
+        sb.append("<h2>See also:</h2>");
+        for (String url : species.getEquivalentWebpages()) {
+            sb.append("<p><a href=\""+ url +"\">"+ url +"</a></p>");
+        }
+        return ("<!DOCTYPE html>\n" +
+                "<html>\n" +
+                "<head lang=\"en\">\n" +
+                "    <meta charset=\"UTF-8\">\n" +
+                "    <title>Occurence</title>\n" +
+                "</head>\n" +
+                "<body>\n" +
+                "<h1>" + species.getScientificName() + "</h1>" +
+                "<img src=\"" + species.getThumbnailURL() + "\"/>"+
+                "\n" + "<p>"+ species.getDescription() +"</p>" +
+                sb.toString() +
+                "</small>" +
+                "</body>\n" +
+                "</html>");
+    }
 }
