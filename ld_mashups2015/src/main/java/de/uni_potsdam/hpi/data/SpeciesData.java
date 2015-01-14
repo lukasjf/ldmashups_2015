@@ -219,6 +219,10 @@ public class SpeciesData {;
                     ResourceFactory.createResource(dBpediaURI));
         }       
     }
+
+    public void setName(String name) {
+        this.name = name;
+    }
     
     /* END: Getter and Setter */
 }

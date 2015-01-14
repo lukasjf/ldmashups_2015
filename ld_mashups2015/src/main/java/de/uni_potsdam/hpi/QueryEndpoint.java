@@ -17,7 +17,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import de.uni_potsdam.hpi.services.WikimediaService;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -67,7 +66,10 @@ public class QueryEndpoint {
                 QuerySolution answer =  results.next();
                 addSpeciesDataToOccurrence(answer.get("species"));
                 QuerySolution sol = getOutputInformation(answer.get("occurrence"));
-                output.put(addOccurenceToJSON(sol));
+                JSONObject occurrenceObject = addOccurrenceToJSON(sol);
+                if (isNotElementOfOccurenceSet(output, occurrenceObject)) {
+                    output.put(occurrenceObject);
+                }
             }            
             try {
                 FileWriter fw;
@@ -88,9 +90,32 @@ public class QueryEndpoint {
             e.printStackTrace();
         }
         return null;
-    }    
-    
-    private JSONObject addOccurenceToJSON(QuerySolution sol) {
+    }
+
+    private boolean isNotElementOfOccurenceSet(JSONArray output, JSONObject occurrenceObject) {
+        if (null == occurrenceObject) {
+            return false;
+        }
+        // Here is something really strange
+        // The length of the array is not equal to the number of elements
+        for (int i = 0; i < output.length(); i++) {
+            JSONObject occ;
+            try {
+                occ = output.getJSONObject(i);
+            } catch (Exception e) {
+                System.err.println("Strange things happened");
+                return false;
+            }
+            if (occ.getString("scientificName").equals(occurrenceObject.getString("scientificName")) &&
+                    occ.getDouble("longitude") == occurrenceObject.getDouble("longitude") &&
+                    occ.getDouble("latitude") == occurrenceObject.getDouble("latitude")) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private JSONObject addOccurrenceToJSON(QuerySolution sol) {
         if (null == sol)
             return null;
         JSONObject occurrence = new JSONObject();
