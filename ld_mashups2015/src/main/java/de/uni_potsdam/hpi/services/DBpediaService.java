@@ -12,7 +12,7 @@ import de.uni_potsdam.hpi.data.SpeciesData;
 public class DBpediaService {
 
     private String sparqlEndpoint = "http://dbpedia.org/sparql";
-    private String queryTemplate = "SELECT ?image ?abstract ?kingdom ?phylum ?family ?animal ?class ?order ?genus ?english_name " +
+    private String queryTemplate = "SELECT ?name ?image ?abstract ?kingdom ?phylum ?family ?animal ?class ?order ?genus ?english_name " +
             "FROM <http://dbpedia.org> " +
             "WHERE { " +
             "{{ ?animal <http://dbpedia.org/property/binomial> \"%s\"@en } UNION " +
@@ -51,11 +51,12 @@ public class DBpediaService {
             species.setTaxonClass(answer.getResource("class").getURI());
             species.setOrder(answer.getResource("order").getURI());
             species.setGenus(answer.getResource("genus").getURI());
-            if (answer.getLiteral("english_name").toString() == null || "".equals(answer.getLiteral("english_name").toString())) {
-                species.setName(species.getBinomial());
+            if (answer.getLiteral("name") == null || "".equals(answer.getLiteral("name").toString())) {
+                species.setSynonyme(species.getBinomial());
             } else {
-                species.setName(answer.getLiteral("english_name").toString());
+                species.setSynonyme(answer.getLiteral("name").toString());
             }
+            species.setName(answer.get("english_name").toString());
         }
      }
 }

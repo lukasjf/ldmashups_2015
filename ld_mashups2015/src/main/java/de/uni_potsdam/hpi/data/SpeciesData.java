@@ -29,6 +29,7 @@ public class SpeciesData {;
     private List<String> imageUrls;
     Resource resource;
 	private String name;
+	private String synonyme;
 
     public SpeciesData(String scientificName, String binomial) {
         this.scientificName = scientificName;
@@ -220,8 +221,20 @@ public class SpeciesData {;
         }       
     }
 
+    public String getName() {
+        return name;
+    }
+
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getSynonyme() {
+        return synonyme;
+    }
+
+    public void setSynonyme(String synonyme) {
+        this.synonyme = synonyme;
     }
     
     /* END: Getter and Setter */
