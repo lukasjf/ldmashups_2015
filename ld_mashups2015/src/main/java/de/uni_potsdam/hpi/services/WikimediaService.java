@@ -19,15 +19,20 @@ public class WikimediaService {
             "http://commons.wikimedia.org/w/api.php?action=query&titles=%s&prop=images&continue=&format=json";
     static String imageURLString = 
             "http://commons.wikimedia.org/w/api.php?action=query&titles=%s&prop=imageinfo&iiprop=url&continue=&format=json";
-    
-    public void includeImagesFromWikimedia(SpeciesData species){        
-        JSONArray images = getImageNames(species.getBinomial());
-        List<String> imageURLs = new LinkedList<String>();
-        for(int i = 0; i < images.length(); i++){
-            JSONObject o = images.getJSONObject(i);
-            imageURLs.add(getImageURLForImageName(o.getString("title")));
+
+
+    public void includeImagesFromWikimedia(SpeciesData species){ 
+        try{
+            List<String> imageURLs = new LinkedList<String>();
+            JSONArray images = getImageNames(species.getBinomial());
+            for(int i = 0; i < images.length(); i++){
+                JSONObject o = images.getJSONObject(i);
+                imageURLs.add(getImageURLForImageName(o.getString("title")));
+            }
+            species.setImageUrls(imageURLs);
+        } catch (Exception e){
+            e.printStackTrace();
         }
-        species.setImageUrls(imageURLs);
     }
     
     private String getImageURLForImageName(String imageName) {
@@ -52,11 +57,13 @@ public class WikimediaService {
     }
 
     private JSONArray getImageNames(String binomial) {
+        System.out.println(binomial);
         JSONArray images = null;
         try {
-            URL url = new URL(String.format(imageListString, binomial));
+            URL url = new URL(String.format(imageListString, binomial.replace(' ', '_')));
             HttpURLConnection wikimediaConnection = (HttpURLConnection)url.openConnection();
             wikimediaConnection.setRequestMethod("GET");
+            System.out.println(wikimediaConnection.getResponseCode());
             JSONObject response = getResponse(wikimediaConnection);
             images = parseToImageArray(response);
         } catch (IOException e) {
@@ -82,7 +89,6 @@ public class WikimediaService {
             response.append('\r');
         }
         rd.close();
-        System.out.println(response.toString());
         return new JSONObject(response.toString());
     }
 }

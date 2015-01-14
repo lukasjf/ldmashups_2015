@@ -18,7 +18,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import de.uni_potsdam.hpi.services.WikimediaService;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -127,7 +126,7 @@ public class QueryEndpoint {
         if (!isSpeciesStored(speciesID)){
             SpeciesData species = getSpecies(speciesID);
             new DBpediaService().includeDataFromDBpedia(species);
-            new WikimediaService().includeImagesFromWikimedia(species);
+            //new WikimediaService().includeImagesFromWikimedia(species);
         }
     }
 

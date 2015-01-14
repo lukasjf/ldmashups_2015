@@ -29,6 +29,7 @@ public class SpeciesData {;
     private List<String> imageUrls;
     Resource resource;
 	private String name;
+	private String synonyme;
 
     public SpeciesData(String scientificName, String binomial) {
         this.scientificName = scientificName;
@@ -218,6 +219,22 @@ public class SpeciesData {;
             resource.addProperty(ResourceFactory.createProperty("http://www.w3.org/2002/07/owl#sameAs"),
                     ResourceFactory.createResource(dBpediaURI));
         }       
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getSynonyme() {
+        return synonyme;
+    }
+
+    public void setSynonyme(String synonyme) {
+        this.synonyme = synonyme;
     }
     
     /* END: Getter and Setter */
