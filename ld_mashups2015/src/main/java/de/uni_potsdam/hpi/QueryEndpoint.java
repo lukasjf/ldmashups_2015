@@ -217,9 +217,9 @@ public class QueryEndpoint {
         }
         sb.append("</p>");
         sb.append("<h2>See also:</h2>");
-        for (String url : species.getEquivalentWebpages()) {
-            sb.append("<p><a href=\""+ url +"\">"+ url +"</a></p>");
-        }
+        //for (String url : species.getEquivalentWebpages()) {
+        //    sb.append("<p><a href=\""+ url +"\">"+ url +"</a></p>");
+        //}
         return ("<!DOCTYPE html>\n" +
                 "<html>\n" +
                 "<head lang=\"en\">\n" +
