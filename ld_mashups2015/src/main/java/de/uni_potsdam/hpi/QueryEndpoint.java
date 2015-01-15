@@ -212,7 +212,7 @@ public class QueryEndpoint {
         StringBuilder sb = new StringBuilder();
         sb.append("<p>");
         for (String url : species.getImageUrls()) {
-            sb.append("<img src=\"" + url + "\"/>");
+            sb.append("<img src=\"" + url + "\" height=\"320\"/>");
 
         }
         sb.append("</p>");
