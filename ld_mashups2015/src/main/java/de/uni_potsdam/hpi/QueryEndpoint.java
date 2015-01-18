@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import de.uni_potsdam.hpi.data.GbifParser;
 import de.uni_potsdam.hpi.data.SpeciesData;
+import de.uni_potsdam.hpi.services.CommonsDbpediaService;
 import de.uni_potsdam.hpi.services.DBpediaService;
 import de.uni_potsdam.hpi.services.GbifService;
 import de.uni_potsdam.hpi.services.WikimediaService;
@@ -68,7 +69,7 @@ public class QueryEndpoint {
                 addSpeciesDataToOccurrence(answer.get("species"));
                 QuerySolution sol = getOutputInformation(answer.get("occurrence"));
                 JSONObject occurrenceObject = addOccurrenceToJSON(sol);
-                if (isNotElementOfOccurenceSet(output, occurrenceObject)) {
+                if (null != occurrenceObject && isNotElementOfOccurenceSet(output, occurrenceObject)) {
                     output.put(occurrenceObject);
                 }
             }            
@@ -86,6 +87,7 @@ public class QueryEndpoint {
                 .header("Access-Control-Allow-Origin", "http://localhost:63342")
                 .type(MediaType.APPLICATION_JSON)
                 .build();
+            System.out.println("Send response");
             return response;
         } catch(Exception e){
             e.printStackTrace();
@@ -152,7 +154,7 @@ public class QueryEndpoint {
         if (!isSpeciesStored(speciesID)){
             SpeciesData species = getSpecies(speciesID);
             new DBpediaService().includeDataFromDBpedia(species);
-            //new WikimediaService().includeImagesFromWikimedia(species);
+            new CommonsDbpediaService().includeDataFromCommonsDBpedia(species);
         }
     }
 
@@ -186,6 +188,7 @@ public class QueryEndpoint {
         QuerySolution sol = qexec.execSelect().next();
         SpeciesData s = new SpeciesData(getModel(),species.toString());
         s.setBinomial(sol.get("binomial").asLiteral().getString());
+        s.setScientificName(sol.get("scientificName").asLiteral().toString());
         return s;
     }
 
@@ -207,8 +210,7 @@ public class QueryEndpoint {
         db.includeDataFromDBpedia(species);
         //FreebaseService fs = new FreebaseService();
         //fs.includeDataFromFreebase(species);
-        WikimediaService ws = new WikimediaService();
-        ws.includeImagesFromWikimedia(species);
+        new CommonsDbpediaService().includeDataFromCommonsDBpedia(species);
         StringBuilder sb = new StringBuilder();
         sb.append("<p>");
         for (String url : species.getImageUrls()) {
