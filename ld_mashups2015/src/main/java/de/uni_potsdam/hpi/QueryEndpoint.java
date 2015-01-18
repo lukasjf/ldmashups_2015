@@ -9,6 +9,7 @@ import de.uni_potsdam.hpi.data.SpeciesData;
 import de.uni_potsdam.hpi.services.CommonsDbpediaService;
 import de.uni_potsdam.hpi.services.DBpediaService;
 import de.uni_potsdam.hpi.services.GbifService;
+import de.uni_potsdam.hpi.services.LinkServices;
 import de.uni_potsdam.hpi.services.WikimediaService;
 
 import javax.ws.rs.DefaultValue;
@@ -212,6 +213,8 @@ public class QueryEndpoint {
         //fs.includeDataFromFreebase(species);
         new CommonsDbpediaService().includeDataFromCommonsDBpedia(species);
         StringBuilder sb = new StringBuilder();
+        LinkServices ls = new LinkServices();
+        ls.includeExternalLinks(species);
         sb.append("<p>");
         for (String url : species.getImageUrls()) {
             sb.append("<img src=\"" + url + "\" height=\"320\"/>");
@@ -219,9 +222,11 @@ public class QueryEndpoint {
         }
         sb.append("</p>");
         sb.append("<h2>See also:</h2>");
-        //for (String url : species.getEquivalentWebpages()) {
-        //    sb.append("<p><a href=\""+ url +"\">"+ url +"</a></p>");
-        //}
+        //sb.append("<p><a href=\"http://eol.org/search?q=" + species.getBinomial() + "\">Encyclopedia of Life</a></p>");
+        //sb.append("<p><a href=\"" + species.getdBpediaURI().replace("dbpedia.org/resource/", "en.wikipedia.org/wiki/") + "\">Wikipedia</a></p>");
+        for (String url : species.getEquivalentWebpages()) {
+            sb.append("<p><a href=\""+ url +"\">"+ url +"</a></p>");
+        }
         return ("<!DOCTYPE html>\n" +
                 "<html>\n" +
                 "<head lang=\"en\">\n" +
