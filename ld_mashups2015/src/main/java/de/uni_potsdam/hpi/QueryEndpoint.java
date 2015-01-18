@@ -9,7 +9,7 @@ import de.uni_potsdam.hpi.data.SpeciesData;
 import de.uni_potsdam.hpi.services.CommonsDbpediaService;
 import de.uni_potsdam.hpi.services.DBpediaService;
 import de.uni_potsdam.hpi.services.GbifService;
-import de.uni_potsdam.hpi.services.LinkServices;
+import de.uni_potsdam.hpi.services.LinkService;
 import de.uni_potsdam.hpi.services.WikimediaService;
 
 import javax.ws.rs.DefaultValue;
@@ -203,7 +203,7 @@ public class QueryEndpoint {
     }
 
     @GET
-    @Produces("text/html")
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("species")
     public String getIt(@QueryParam("species")String binomial, @QueryParam("scientificName")String scientificName) {
         SpeciesData species = new SpeciesData(scientificName, binomial);
@@ -213,7 +213,7 @@ public class QueryEndpoint {
         //fs.includeDataFromFreebase(species);
         new CommonsDbpediaService().includeDataFromCommonsDBpedia(species);
         StringBuilder sb = new StringBuilder();
-        LinkServices ls = new LinkServices();
+        LinkService ls = new LinkService();
         ls.includeExternalLinks(species);
         sb.append("<p>");
         for (String url : species.getImageUrls()) {
@@ -242,4 +242,5 @@ public class QueryEndpoint {
                 "</body>\n" +
                 "</html>");
     }
+    
 }
