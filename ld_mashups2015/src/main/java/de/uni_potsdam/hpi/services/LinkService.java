@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * This class checks for different Webresources and adds the link to the species.
  */
-public class LinkServices {
+public class LinkService {
 
     public void includeExternalLinks(SpeciesData species) {
         List<String> links = new LinkedList<String>();
