@@ -200,9 +200,15 @@ public class QueryEndpoint {
     }
 
     @GET
-    @Produces("text/html")
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("species")
-    public String getIt(@QueryParam("species")String binomial, @QueryParam("scientificName")String scientificName) {
+    public String getIt(@QueryParam("species")String speciesID) {
+        String speciesQuery = "SELECT distinct ?scientificName ?thumbnailURL ?description ?equivalentWebpage ?imageUrl where{ " +
+                "?species <http://"
+                "?species <http://rs.tdwg.org/dwc/terms/scientificName> ?scientificName . " +
+                "?species <http://dbpedia.org/ontology/abstract> ?abstract ."+
+                "?species <http://dbpedia.org/ontology/thumbnail> ?thumbnailURL ."+
+                "?species <http://rs.tdwg.org/dwc/terms/associatedMedia> ?imageUrl . ";
         SpeciesData species = new SpeciesData(scientificName, binomial);
         DBpediaService db = new DBpediaService();
         db.includeDataFromDBpedia(species);
