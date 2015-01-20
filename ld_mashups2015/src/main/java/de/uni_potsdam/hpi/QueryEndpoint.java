@@ -1,9 +1,12 @@
 package de.uni_potsdam.hpi;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import com.hp.hpl.jena.sparql.resultset.JSONOutput;
+import com.hp.hpl.jena.sparql.resultset.JSONOutputResultSet;
 import de.uni_potsdam.hpi.data.GbifParser;
 import de.uni_potsdam.hpi.data.SpeciesData;
 import de.uni_potsdam.hpi.services.CommonsDbpediaService;
@@ -204,49 +207,85 @@ public class QueryEndpoint {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("species")
-    public String getIt(@QueryParam("species")String speciesID) {
-        String speciesQuery = "SELECT distinct ?scientificName ?thumbnailURL ?description ?equivalentWebpage ?imageUrl where{ " +
-                "?species <http://"
-                "?species <http://rs.tdwg.org/dwc/terms/scientificName> ?scientificName . " +
-                "?species <http://dbpedia.org/ontology/abstract> ?abstract ."+
-                "?species <http://dbpedia.org/ontology/thumbnail> ?thumbnailURL ."+
-                "?species <http://rs.tdwg.org/dwc/terms/associatedMedia> ?imageUrl . ";
-        SpeciesData species = new SpeciesData(scientificName, binomial);
-        DBpediaService db = new DBpediaService();
-        db.includeDataFromDBpedia(species);
-        //FreebaseService fs = new FreebaseService();
-        //fs.includeDataFromFreebase(species);
-        new CommonsDbpediaService().includeDataFromCommonsDBpedia(species);
-        StringBuilder sb = new StringBuilder();
-        LinkService ls = new LinkService();
-        ls.includeExternalLinks(species);
-        sb.append("<p>");
-        for (String url : species.getImageUrls()) {
-            sb.append("<img src=\"" + url + "\" height=\"320\"/>");
+    @Path("speciesimages")
+    public String getsPECIESiMAGES(@QueryParam("species")String speciesID) {
+        String speciesKey = "<http://www.gbif.org/species/" + speciesID + ">";
+        String speciesQuery = "SELECT distinct ?imageUrl where{ " +
+                speciesKey + "<http://rs.tdwg.org/dwc/terms/associatedMedia> ?imageUrl}";
+        Query query = QueryFactory.create(speciesQuery);
+        QueryExecution qexec = QueryExecutionFactory
+                .create(query, getModel());
+        ResultSet results = qexec.execSelect();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        JSONOutput jsonOut = new JSONOutput();
+        jsonOut.format(baos, results);
+        String resultString = baos.toString();
+        return resultString;
+    }
 
-        }
-        sb.append("</p>");
-        sb.append("<h2>See also:</h2>");
-        //sb.append("<p><a href=\"http://eol.org/search?q=" + species.getBinomial() + "\">Encyclopedia of Life</a></p>");
-        //sb.append("<p><a href=\"" + species.getdBpediaURI().replace("dbpedia.org/resource/", "en.wikipedia.org/wiki/") + "\">Wikipedia</a></p>");
-        for (String url : species.getEquivalentWebpages()) {
-            sb.append("<p><a href=\""+ url +"\">"+ url +"</a></p>");
-        }
-        return ("<!DOCTYPE html>\n" +
-                "<html>\n" +
-                "<head lang=\"en\">\n" +
-                "    <meta charset=\"UTF-8\">\n" +
-                "    <title>Occurence</title>\n" +
-                "</head>\n" +
-                "<body>\n" +
-                "<h1>" + species.getScientificName() + "</h1>" +
-                "<img src=\"" + species.getThumbnailURL() + "\"/>"+
-                "\n" + "<p>"+ species.getDescription() +"</p>" +
-                sb.toString() +
-                "</small>" +
-                "</body>\n" +
-                "</html>");
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("species")
+    public String getSpeciesData(@QueryParam("species")String speciesID) {
+        String speciesKey = "<http://www.gbif.org/species/" + speciesID + ">";
+        String speciesQuery = "SELECT distinct ?scientificName ?thumbnailURL ?abstract where{ " +
+                speciesKey + " <http://rs.tdwg.org/dwc/terms/scientificName> ?scientificName . " +
+                speciesKey + "<http://dbpedia.org/ontology/abstract> ?abstract ."+
+                speciesKey + "<http://dbpedia.org/ontology/thumbnail> ?thumbnailURL}";
+        Query query = QueryFactory.create(speciesQuery);
+        QueryExecution qexec = QueryExecutionFactory
+                .create(query, getModel());
+        ResultSet results = qexec.execSelect();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        JSONOutput jsonOut = new JSONOutput();
+        jsonOut.format(baos, results);
+        String resultString = baos.toString();
+        return resultString;
+//
+//        while (results.hasNext()) {
+//            results.to
+//        }x
+//
+//        try {
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        SpeciesData species = new SpeciesData(scientificName, binomial);
+//        DBpediaService db = new DBpediaService();
+//        db.includeDataFromDBpedia(species);
+//        //FreebaseService fs = new FreebaseService();
+//        //fs.includeDataFromFreebase(species);
+//        new CommonsDbpediaService().includeDataFromCommonsDBpedia(species);
+//        StringBuilder sb = new StringBuilder();
+//        LinkService ls = new LinkService();
+//        ls.includeExternalLinks(species);
+//        sb.append("<p>");
+//        for (String url : species.getImageUrls()) {
+//            sb.append("<img src=\"" + url + "\" height=\"320\"/>");
+//
+//        }
+//        sb.append("</p>");
+//        sb.append("<h2>See also:</h2>");
+//        //sb.append("<p><a href=\"http://eol.org/search?q=" + species.getBinomial() + "\">Encyclopedia of Life</a></p>");
+//        //sb.append("<p><a href=\"" + species.getdBpediaURI().replace("dbpedia.org/resource/", "en.wikipedia.org/wiki/") + "\">Wikipedia</a></p>");
+//        for (String url : species.getEquivalentWebpages()) {
+//            sb.append("<p><a href=\""+ url +"\">"+ url +"</a></p>");
+//        }
+//        return ("<!DOCTYPE html>\n" +
+//                "<html>\n" +
+//                "<head lang=\"en\">\n" +
+//                "    <meta charset=\"UTF-8\">\n" +
+//                "    <title>Occurence</title>\n" +
+//                "</head>\n" +
+//                "<body>\n" +
+//                "<h1>" + species.getScientificName() + "</h1>" +
+//                "<img src=\"" + species.getThumbnailURL() + "\"/>"+
+//                "\n" + "<p>"+ species.getDescription() +"</p>" +
+//                sb.toString() +
+//                "</small>" +
+//                "</body>\n" +
+//                "</html>");
     }
     
 }

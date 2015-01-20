@@ -39,10 +39,14 @@ public class GbifParser {
         occurrence.setMonth(""+ result.getInt("month"));
         occurrence.setDay(""+ result.getInt("day"));
         occurrence.setGeodeticDatum(""+ result.get("geodeticDatum"));
-        SpeciesData occurredSpecies = new SpeciesData(model, "http://www.gbif.org/species/" + result.getInt("speciesKey"));
-        occurrence.setSpecies(occurredSpecies);
-        occurredSpecies.setBinomial(result.getString("species"));
-        occurredSpecies.setScientificName(result.getString("scientificName"));
+        try {
+            SpeciesData occurredSpecies = new SpeciesData(model, "http://www.gbif.org/species/" + result.getInt("speciesKey"));
+            occurrence.setSpecies(occurredSpecies);
+            occurredSpecies.setBinomial(result.getString("species"));
+            occurredSpecies.setScientificName(result.getString("scientificName"));
+        } catch (Exception e) {
+            System.err.println("Species misses key: " + result.getString("scientificName"));
+        }
         return occurrence;
     }
 }
