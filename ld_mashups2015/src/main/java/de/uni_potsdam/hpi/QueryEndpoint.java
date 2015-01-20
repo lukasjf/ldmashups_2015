@@ -205,10 +205,7 @@ public class QueryEndpoint {
         return qexec.execAsk();
     }
 
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("speciesimages")
-    public String getsPECIESiMAGES(@QueryParam("species")String speciesID) {
+    public String getSpeciesImages(@QueryParam("species")String speciesID) {
         String speciesKey = "<http://www.gbif.org/species/" + speciesID + ">";
         String speciesQuery = "SELECT distinct ?imageUrl where{ " +
                 speciesKey + "<http://rs.tdwg.org/dwc/terms/associatedMedia> ?imageUrl}";
@@ -227,6 +224,15 @@ public class QueryEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("species")
     public String getSpeciesData(@QueryParam("species")String speciesID) {
+        JSONObject speciesInformation = new JSONObject(getSpeciesInformation(speciesID));
+        JSONObject speciesImages = new JSONObject(getSpeciesImages(speciesID));
+        speciesInformation.getJSONObject("head").getJSONArray("vars").put("imageUrls");
+        JSONArray imageURLs = speciesImages.getJSONObject("results").getJSONArray("bindings");
+        speciesInformation.getJSONObject("results").getJSONArray("bindings").getJSONObject(0).append("imageUrls", imageURLs);
+        return speciesInformation.toString();
+    }
+
+    public String getSpeciesInformation(@QueryParam("species")String speciesID) {
         String speciesKey = "<http://www.gbif.org/species/" + speciesID + ">";
         String speciesQuery = "SELECT distinct ?scientificName ?thumbnailURL ?abstract where{ " +
                 speciesKey + " <http://rs.tdwg.org/dwc/terms/scientificName> ?scientificName . " +
