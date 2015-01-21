@@ -6,14 +6,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import com.hp.hpl.jena.sparql.resultset.JSONOutput;
-import com.hp.hpl.jena.sparql.resultset.JSONOutputResultSet;
 import de.uni_potsdam.hpi.data.GbifParser;
 import de.uni_potsdam.hpi.data.SpeciesData;
 import de.uni_potsdam.hpi.services.CommonsDbpediaService;
 import de.uni_potsdam.hpi.services.DBpediaService;
 import de.uni_potsdam.hpi.services.GbifService;
-import de.uni_potsdam.hpi.services.LinkService;
-import de.uni_potsdam.hpi.services.WikimediaService;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -23,6 +20,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import de.uni_potsdam.hpi.services.LinkService;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -159,6 +157,7 @@ public class QueryEndpoint {
             SpeciesData species = getSpecies(speciesID);
             new DBpediaService().includeDataFromDBpedia(species);
             new CommonsDbpediaService().includeDataFromCommonsDBpedia(species);
+            new LinkService().includeExternalLinks(species);
         }
     }
 
@@ -205,7 +204,7 @@ public class QueryEndpoint {
         return qexec.execAsk();
     }
 
-    public String getSpeciesImages(@QueryParam("species")String speciesID) {
+    public String getSpeciesImages(String speciesID) {
         String speciesKey = "<http://www.gbif.org/species/" + speciesID + ">";
         String speciesQuery = "SELECT distinct ?imageUrl where{ " +
                 speciesKey + "<http://rs.tdwg.org/dwc/terms/associatedMedia> ?imageUrl}";
@@ -226,13 +225,33 @@ public class QueryEndpoint {
     public String getSpeciesData(@QueryParam("species")String speciesID) {
         JSONObject speciesInformation = new JSONObject(getSpeciesInformation(speciesID));
         JSONObject speciesImages = new JSONObject(getSpeciesImages(speciesID));
+        JSONObject speciesUrls = new JSONObject(getSpeciesUrls(speciesID));
         speciesInformation.getJSONObject("head").getJSONArray("vars").put("imageUrls");
+        speciesInformation.getJSONObject("head").getJSONArray("vars").put("equivalentWebpages");
         JSONArray imageURLs = speciesImages.getJSONObject("results").getJSONArray("bindings");
+        JSONArray equivalentWebpages = speciesUrls.getJSONObject("results").getJSONArray("bindings");
         speciesInformation.getJSONObject("results").getJSONArray("bindings").getJSONObject(0).append("imageUrls", imageURLs);
+        speciesInformation.getJSONObject("results").getJSONArray("bindings").getJSONObject(0).append("equivalentWebpages", equivalentWebpages);
         return speciesInformation.toString();
     }
 
-    public String getSpeciesInformation(@QueryParam("species")String speciesID) {
+    public String getSpeciesUrls(String speciesID) {
+        String speciesKey = "<http://www.gbif.org/species/" + speciesID + ">";
+        String speciesQuery = "SELECT distinct ?equivalentWebpages where{ " +
+                speciesKey + "<http://www.w3.org/2002/07/owl#sameAs> ?equivalentWebpages }";
+        Query query = QueryFactory.create(speciesQuery);
+        QueryExecution qexec = QueryExecutionFactory
+                .create(query, getModel());
+        ResultSet results = qexec.execSelect();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        JSONOutput jsonOut = new JSONOutput();
+        jsonOut.format(baos, results);
+        String resultString = baos.toString();
+        return resultString;
+
+    }
+
+    public String getSpeciesInformation(String speciesID) {
         String speciesKey = "<http://www.gbif.org/species/" + speciesID + ">";
         String speciesQuery = "SELECT distinct ?scientificName ?thumbnailURL ?abstract where{ " +
                 speciesKey + " <http://rs.tdwg.org/dwc/terms/scientificName> ?scientificName . " +
@@ -247,51 +266,6 @@ public class QueryEndpoint {
         jsonOut.format(baos, results);
         String resultString = baos.toString();
         return resultString;
-//
-//        while (results.hasNext()) {
-//            results.to
-//        }x
-//
-//        try {
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        SpeciesData species = new SpeciesData(scientificName, binomial);
-//        DBpediaService db = new DBpediaService();
-//        db.includeDataFromDBpedia(species);
-//        //FreebaseService fs = new FreebaseService();
-//        //fs.includeDataFromFreebase(species);
-//        new CommonsDbpediaService().includeDataFromCommonsDBpedia(species);
-//        StringBuilder sb = new StringBuilder();
-//        LinkService ls = new LinkService();
-//        ls.includeExternalLinks(species);
-//        sb.append("<p>");
-//        for (String url : species.getImageUrls()) {
-//            sb.append("<img src=\"" + url + "\" height=\"320\"/>");
-//
-//        }
-//        sb.append("</p>");
-//        sb.append("<h2>See also:</h2>");
-//        //sb.append("<p><a href=\"http://eol.org/search?q=" + species.getBinomial() + "\">Encyclopedia of Life</a></p>");
-//        //sb.append("<p><a href=\"" + species.getdBpediaURI().replace("dbpedia.org/resource/", "en.wikipedia.org/wiki/") + "\">Wikipedia</a></p>");
-//        for (String url : species.getEquivalentWebpages()) {
-//            sb.append("<p><a href=\""+ url +"\">"+ url +"</a></p>");
-//        }
-//        return ("<!DOCTYPE html>\n" +
-//                "<html>\n" +
-//                "<head lang=\"en\">\n" +
-//                "    <meta charset=\"UTF-8\">\n" +
-//                "    <title>Occurence</title>\n" +
-//                "</head>\n" +
-//                "<body>\n" +
-//                "<h1>" + species.getScientificName() + "</h1>" +
-//                "<img src=\"" + species.getThumbnailURL() + "\"/>"+
-//                "\n" + "<p>"+ species.getDescription() +"</p>" +
-//                sb.toString() +
-//                "</small>" +
-//                "</body>\n" +
-//                "</html>");
     }
     
 }

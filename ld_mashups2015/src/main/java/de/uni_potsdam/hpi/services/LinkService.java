@@ -13,12 +13,14 @@ import java.util.List;
 public class LinkService {
 
     public void includeExternalLinks(SpeciesData species) {
-        List<String> links = new LinkedList<String>();
-        links.add(getWikipediaLink(species));
-        addEOFLinkIfExists(links, species);
-        addBBCLinkIfExists(links, species);
-        links.add(species.getEntityURI());
-        species.setEquivalentWebpages(links);
+        if (species.getdBpediaURI() != null) {
+            List<String> links = new LinkedList<String>();
+            addWikipediaLinkIfExists(links, species);
+            addEOFLinkIfExists(links, species);
+            addBBCLinkIfExists(links, species);
+            links.add(species.getEntityURI());
+            species.setEquivalentWebpages(links);
+        }
     }
 
     private void addEOFLinkIfExists(List<String> links, SpeciesData species) {
@@ -30,7 +32,7 @@ public class LinkService {
             eolClient.setRequestMethod("GET");
             int responseCode = eolClient.getResponseCode();
             if (302 != responseCode && 200 != responseCode) {
-                throw new Exception("Request Failed!");
+                return;
             }
             links.add(eolClient.getURL().toString());
         } catch(Exception e) {
@@ -47,7 +49,7 @@ public class LinkService {
             bbcClient.setRequestMethod("GET");
             int responseCode = bbcClient.getResponseCode();
             if (200 != responseCode && 302 != responseCode && 303 != responseCode) {
-                throw new Exception("Request Failed!");
+                return;
             }
             links.add(uri);
         } catch(Exception e) {
@@ -55,7 +57,9 @@ public class LinkService {
         }
     }
 
-    private String getWikipediaLink(SpeciesData species) {
-        return species.getdBpediaURI().replace("dbpedia.org/resource/", "en.wikipedia.org/wiki/");
+    private void addWikipediaLinkIfExists(List<String> links, SpeciesData species) {
+        if (species.getdBpediaURI() != null) {
+            links.add(species.getdBpediaURI().replace("dbpedia.org/resource/", "en.wikipedia.org/wiki/"));
+        }
     }
 }
