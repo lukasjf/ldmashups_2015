@@ -238,8 +238,17 @@ public class SpeciesData {;
     }
 
     public void setSynonyme(String synonyme) {
-        this.synonyme = synonyme;
+        if (null != synonyme) {
+            this.synonyme = synonyme;
+            resource.addProperty(ResourceFactory.createProperty("http://dbpedia.org/property/synonyms"), this.synonyme);
+        }
     }
     
     /* END: Getter and Setter */
+
+    public String getShortSynonyme() {
+        return synonyme.split(" \\(")[0];
+    }
+
+
 }

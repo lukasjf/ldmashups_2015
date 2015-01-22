@@ -130,11 +130,12 @@ public class QueryEndpoint {
         occurrence.put("abstract", sol.get("abstract").asLiteral().getString());
         occurrence.put("binomial", sol.get("binomial").asLiteral().getString());
         occurrence.put("scientificName", sol.get("scientificName").asLiteral().getString());
+        occurrence.put("species", sol.get("species").asResource().getURI().toString());
         return occurrence;
     }
 
     private QuerySolution getOutputInformation(RDFNode occurrence) {
-        String occurrenceQuery = "Select ?latitude ?longitude ?abstract ?thumbnailURL ?binomial ?scientificName where{"+
+        String occurrenceQuery = "Select ?species ?latitude ?longitude ?abstract ?thumbnailURL ?binomial ?scientificName where{"+
                 "<"+occurrence.toString()+">"+ "<http://rs.tdwg.org/dwc/terms/decimalLatitude> ?latitude ."+
                 "<"+occurrence.toString()+">"+ "<http://rs.tdwg.org/dwc/terms/decimalLongitude> ?longitude ."+
                 "<"+occurrence.toString()+">"+ "<http://rs.tdwg.org/dwc/terms/associatedTaxa> ?species ."+
@@ -205,7 +206,7 @@ public class QueryEndpoint {
     }
 
     public String getSpeciesImages(String speciesID) {
-        String speciesKey = "<http://www.gbif.org/species/" + speciesID + ">";
+        String speciesKey = "<" + speciesID + ">";
         String speciesQuery = "SELECT distinct ?imageUrl where{ " +
                 speciesKey + "<http://rs.tdwg.org/dwc/terms/associatedMedia> ?imageUrl}";
         Query query = QueryFactory.create(speciesQuery);
@@ -236,7 +237,7 @@ public class QueryEndpoint {
     }
 
     public String getSpeciesUrls(String speciesID) {
-        String speciesKey = "<http://www.gbif.org/species/" + speciesID + ">";
+        String speciesKey = "<" + speciesID + ">";
         String speciesQuery = "SELECT distinct ?equivalentWebpages where{ " +
                 speciesKey + "<http://www.w3.org/2002/07/owl#sameAs> ?equivalentWebpages }";
         Query query = QueryFactory.create(speciesQuery);
@@ -252,7 +253,7 @@ public class QueryEndpoint {
     }
 
     public String getSpeciesInformation(String speciesID) {
-        String speciesKey = "<http://www.gbif.org/species/" + speciesID + ">";
+        String speciesKey = "<" + speciesID + ">";
         String speciesQuery = "SELECT distinct ?scientificName ?thumbnailURL ?abstract where{ " +
                 speciesKey + " <http://rs.tdwg.org/dwc/terms/scientificName> ?scientificName . " +
                 speciesKey + "<http://dbpedia.org/ontology/abstract> ?abstract ."+

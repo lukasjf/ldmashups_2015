@@ -125,8 +125,10 @@
                    var images = "";
                    for (var i = 0; i < feature.get('data')['occurrenceInfo'].length; i++) {
                        var occ = feature.get('data')['occurrenceInfo'][i];
-                       images = images + '<a href="/api/species?species=' + occ['binomial'] +
-                            '&scientificName=' + occ['scientificName'] + '">' +
+                       images = images + '<a href="/taxon-finder/species.html?species=' + occ['species'] +
+//                       images = images + '<a href="/api/species?species=' + occ['binomial'] +
+//                            '&scientificName=' + occ['scientificName'] + '">' +
+                            '">' +
                             '<img src="' + occ['thumbnailURL']  + '"/></a>';
                    }
                    images = images;
