@@ -247,7 +247,10 @@ public class SpeciesData {;
     /* END: Getter and Setter */
 
     public String getShortSynonyme() {
-        return synonyme.split(" \\(")[0];
+        if (synonyme != null) {
+            return synonyme.split(" \\(")[0];
+        }
+        return null;
     }
 
 

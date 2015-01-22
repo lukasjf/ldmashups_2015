@@ -15,7 +15,7 @@ public class DBpediaService {
     private String queryTemplate = "SELECT ?name ?image ?abstract ?kingdom ?phylum ?family ?animal ?class ?order ?genus ?english_name " +
             "FROM <http://dbpedia.org> " +
             "WHERE { " +
-            "{{ ?animal <http://dbpedia.org/property/binomial> \"%s\"@en } UNION " +
+            "{{ ?animal <http://dbpedia.org/property/binomial> ?binomial FILTER <http://www.w3.org/2005/xpath-functions/#contains>(?binomial, \"%s\") } UNION " +
             "{ ?animal <http://dbpedia.org/property/synonyms> ?name FILTER <http://www.w3.org/2005/xpath-functions/#contains>(?name, \"%s\") }}" +
             "?animal <http://dbpedia.org/ontology/thumbnail> ?image . " +
             "?animal <http://dbpedia.org/ontology/abstract> ?abstract . " +
