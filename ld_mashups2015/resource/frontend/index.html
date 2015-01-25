@@ -26,6 +26,7 @@
     </style>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" type="text/css" href="index.css">
     </head>
 </head>
 <body onload="loadMap()">
@@ -43,6 +44,8 @@
             document.getElementById('images').style.display = 'none';
             document.getElementById('images').innerHTML= '';
         }
+        
+        $('#the-element').click(function () { /* perform action here */ });
 
         function showSearch() {
             for (var el = 0;  el < document.getElementById('searchform').getElementsByTagName('label').length; el++) {
@@ -51,7 +54,6 @@
             for (var el = 0; el < document.getElementById('searchform').getElementsByTagName('input').length; el++) {
                 document.getElementById('searchform').getElementsByTagName('input')[el].style.display="";
             }
-            //document.getElementById('searchdiv').style.display = '';
         }
 
         function getRendererFromQueryString() {
@@ -125,15 +127,11 @@
                    var images = "";
                    for (var i = 0; i < feature.get('data')['occurrenceInfo'].length; i++) {
                        var occ = feature.get('data')['occurrenceInfo'][i];
-                       images = images + "<table style='float:left;width:300px'><tr><td></td>";
-                       images = images + '<td rowspan=2><a href="/taxon-finder/species.html?species=' + occ['species'] +
-//                       images = images + '<a href="/api/species?species=' + occ['binomial'] +
-//                            '&scientificName=' + occ['scientificName'] + '">' +
-                            '">' +
-                            '<img src="' + occ['thumbnailURL']  + '"/></a></td></tr><tr><td colspan=2 valign="bottom">' +
-                            occ['binomial'] + '</td></tr></table>'
+                       var species = occ['species'];
+                       images = images + '<a href="#" onClick="getSpeciesInfo(\''+species+'\')">' +
+                            '<img src="' + occ['thumbnailURL']  + '"/></a>';
                    }
-                   images = images + '';
+                   images = images;
                    var imagesElement = document.getElementById('images');
                    imagesElement.style.display = "";
                    imagesElement.innerHTML = images;
@@ -154,6 +152,8 @@
                }
            });
        }
+       
+       
 
         function addFeaturesFor(data) {
             var features = [];
@@ -245,6 +245,33 @@
         $(document).ready(function() {
             SEARCH_AJAX_FORM.initSearchForm();
         });
+    	
+    	function getSpeciesInfo(speciesID){
+    		$.ajax({
+    		       url: 'http://localhost:9998/api/species?species='+speciesID,
+    		       type: 'GET',
+    		       dataType: 'application/json',
+    		       complete: function(data){
+    		    	   var json = $.parseJSON(data.responseText);
+    		    	   var species = json['results']['bindings'][0];
+    		    	   document.getElementById('scientificName').innerHTML="<h1>"+species['scientificName']['value']+"</h1>";
+    		    	   document.getElementById('abstract').innerHTML=species['abstract']['value'];
+    		    	   document.getElementById('thumbnail').setAttribute("src",species['thumbnailURL']['value']);
+    		    	   $.each(species['equivalentWebpages'][0], function(i, item) {
+    		    		   $("<a href=\""+item['equivalentWebpages']['value']+ "\">"+item['equivalentWebpages']['value']+"</a>")
+    		    		   	.appendTo("div#speciesLinks");
+    		    		   $("<br></br>").appendTo("div#speciesLinks");
+    		    	   });
+    		    	   
+    		    	   $.each(species['imageUrls'][0], function(i, item) {
+    		    		   $("<img src=\""+item['imageUrl']['value']+ "\"height=\"300\">")
+    		    		   	.appendTo("div#speciesImages");
+    		    	   });
+    		        	document.getElementById("mapdiv").style.width="75%";
+    		        	document.getElementById("speciesdiv").style.width="25%";
+    		       }
+    		})
+    	}
 
     </script>
     <div id="title" style="display:flex;">
@@ -255,23 +282,20 @@
             <button class="btn btn-info" type="submit"><i class="glyphicon glyphicon-search"></i></button>
         </form>
     </div>
-    <div id="mapdiv">
-        <div id="popup"></div>
-    </div>
-    <div id="searchdiv" style="display:none; margin-top:50px" onclick="hideDiv()">
-    <!--    <form id="search-form">
-            <div class="panel">
-            <div class="panel-body">
-                <label for="longitude">longitude:</label><input name="longitude" type="text" value="13.133317" id="longitude" style="border-radius:10px; -moz-border-radius:10px; -webkit-border-radius:10px;"/>
-                <label for="latitude">latitude:</label><input name="latitude" type="text" value="52.394050" id="latitude" style="border-radius:10px; -moz-border-radius:10px; -webkit-border-radius:10px;"/>
-            </div>
-            <div class="panel-footer">
-                <input class="btn btn-info" type="submit"/>
-            </div>
-            </div>
-        </form>-->
-    </div>
+    <div id="container">
+	    <div id="mapdiv">
+	        <div id="popup"></div>
+	    </div>    
+    	<div id="speciesdiv">
+    	    <div id="scientificName"></div>
+    		<div id="abstract"></div>
+    		<img id="thumbnail" src="">
+    		<div id="speciesLinks"></div>
+			<div id="speciesImages"></div>
+    	</div>
+    <div id="searchdiv" style="display:none; margin-top:50px" onclick="hideDiv()"></div>
     <div id="images" style="overflow-y: scroll; display: none;" onclick="hideDiv()"></div>
     </div>
+
 </body>
 </html>
