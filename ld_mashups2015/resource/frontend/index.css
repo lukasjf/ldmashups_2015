@@ -1,0 +1,14 @@
+@CHARSET "ISO-8859-1";
+
+#container {
+	border: 1px solid #000000;
+}
+
+#mapdiv {
+	float: left;
+	width: 100%;
+}
+
+#speciesdiv {
+	float: right;
+}
