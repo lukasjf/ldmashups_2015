@@ -125,13 +125,15 @@
                    var images = "";
                    for (var i = 0; i < feature.get('data')['occurrenceInfo'].length; i++) {
                        var occ = feature.get('data')['occurrenceInfo'][i];
-                       images = images + '<a href="/taxon-finder/species.html?species=' + occ['species'] +
+                       images = images + "<table style='float:left;width:300px'><tr><td></td>";
+                       images = images + '<td rowspan=2><a href="/taxon-finder/species.html?species=' + occ['species'] +
 //                       images = images + '<a href="/api/species?species=' + occ['binomial'] +
 //                            '&scientificName=' + occ['scientificName'] + '">' +
                             '">' +
-                            '<img src="' + occ['thumbnailURL']  + '"/></a>';
+                            '<img src="' + occ['thumbnailURL']  + '"/></a></td></tr><tr><td colspan=2 valign="bottom">' +
+                            occ['binomial'] + '</td></tr></table>'
                    }
-                   images = images;
+                   images = images + '';
                    var imagesElement = document.getElementById('images');
                    imagesElement.style.display = "";
                    imagesElement.innerHTML = images;
