@@ -292,25 +292,37 @@
     		       type: 'GET',
     		       dataType: 'application/json',
     		       complete: function(data){
-    		    	   var json = $.parseJSON(data.responseText);
-    		    	   var species = json['results']['bindings'][0];
-    		    	   document.getElementById('scientificName').innerHTML="<h1>"+species['scientificName']['value']+"</h1>";
-    		    	   document.getElementById('abstract').innerHTML=species['abstract']['value'];
-    		    	   document.getElementById('thumbnail').setAttribute("src",species['thumbnailURL']['value']);
-    		    	   $.each(species['equivalentWebpages'][0], function(i, item) {
-    		    		   $("<a href=\""+item['equivalentWebpages']['value']+ "\">"+item['equivalentWebpages']['value']+"</a>")
-    		    		   	.appendTo("div#speciesLinks");
-    		    		   $("<br></br>").appendTo("div#speciesLinks");
-    		    	   });
-    		    	   
-    		    	   $.each(species['imageUrls'][0], function(i, item) {
-    		    		   $("<img src=\""+item['imageUrl']['value']+ "\"height=\"300\">")
-    		    		   	.appendTo("div#speciesImages");
-    		    	   });
-    		        	document.getElementById("mapdiv").style.width="75%";
-    		        	document.getElementById("speciesdiv").style.width="25%";
+					  var json = $.parseJSON(data.responseText);
+					  var species = json['results']['bindings'][0];
+					  document.getElementById('scientificName').innerHTML="<h1>"+species['scientificName']['value']+"</h1>";
+					  document.getElementById('abstract').innerHTML=species['abstract']['value'];
+					  document.getElementById('thumbnail').setAttribute("src",species['thumbnailURL']['value']);
+					  $.each(species['equivalentWebpages'][0], function(i, item) {
+					   	$("<a href=\""+item['equivalentWebpages']['value']+ "\">"+item['equivalentWebpages']['value']+"</a>")
+					   		.appendTo("div#speciesLinks");
+					   	$("<br></br>").appendTo("div#speciesLinks");
+					  });
+					  
+					  $.each(species['imageUrls'][0], function(i, item) {
+					   	$("<img src=\""+item['imageUrl']['value']+ "\"height=\"300\">")
+					   		.appendTo("div#speciesImages");
+					  });
+					  addTaxonData(species);
+					  document.getElementById("mapdiv").style.width="75%";
+					  document.getElementById("speciesdiv").style.width="25%";
     		       }
     		})
+    	}
+    	
+    	function addTaxonData(species){
+    		var taxonContent = "";
+    		taxonContent += "<button type=\"button\" class=\"btn btn-info\" data-toggle=\"collapse\" data-target=\".taxon\">Taxonomy</button>"
+    		taxonContent += "<div class = \"collapse taxon\">asdf</div>";
+    		taxonContent += "<div class = \"collapse taxon\">asdf</div>";
+    		taxonContent += "<div class = \"collapse taxon\">asdf</div>";
+    		taxonContent += "<div class = \"collapse taxon\">asdf</div>";
+    		//taxonContent += "<div id=\"kingdom\" class = \"collapse taxon\">"+ species['kingdom']['value'] + "</div>";
+    		document.getElementById('taxondiv').innerHTML=taxonContent;
     	}
 
     </script>
@@ -327,7 +339,16 @@
 	        <div id="popup"></div>
 	    </div>    
     	<div id="speciesdiv">
-    	    <div id="scientificName"></div>
+    		<div id="taxondiv">
+			    <div id="kingdom" class="collapse taxon"></div>
+			    <div id="phylum" class="collapse taxon"></div>
+			    <div id="class" class="collapse taxon"></div>
+			    <div id="order" class="collapse taxon"></div>
+			    <div id="family" class="collapse taxon"></div>
+			    <div id="genus" class="collapse taxon"></div>
+			    <div id="species" class="collapse taxon"></div>
+    		</div>
+    	    <div id="scientificName"></div>	
     		<div id="abstract"></div>
     		<img id="thumbnail" src="">
     		<div id="speciesLinks"></div>
