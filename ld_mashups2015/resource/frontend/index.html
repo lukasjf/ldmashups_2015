@@ -303,6 +303,7 @@
 					   	$("<br></br>").appendTo("div#speciesLinks");
 					  });
 					  
+					  $('div#speciesImages').empty();
 					  $.each(species['imageUrls'][0], function(i, item) {
 					   	$("<img src=\""+item['imageUrl']['value']+ "\"height=\"300\">")
 					   		.appendTo("div#speciesImages");
@@ -317,11 +318,14 @@
     	function addTaxonData(species){
     		var taxonContent = "";
     		taxonContent += "<button type=\"button\" class=\"btn btn-info\" data-toggle=\"collapse\" data-target=\".taxon\">Taxonomy</button>"
-    		taxonContent += "<div class = \"collapse taxon\">asdf</div>";
-    		taxonContent += "<div class = \"collapse taxon\">asdf</div>";
-    		taxonContent += "<div class = \"collapse taxon\">asdf</div>";
-    		taxonContent += "<div class = \"collapse taxon\">asdf</div>";
-    		//taxonContent += "<div id=\"kingdom\" class = \"collapse taxon\">"+ species['kingdom']['value'] + "</div>";
+    		taxonContent += "<div id=\"kingdom\" class = \"collapse taxon\"> Kingdom:"+ species['kingdom']['value'] + "</div>";
+    		taxonContent += "<div id=\"phylum\" class = \"collapse taxon\"> Phylum:"+ species['phylum']['value'] + "</div>";
+    		taxonContent += "<div id=\"class\" class = \"collapse taxon\"> Class:"+ species['class']['value'] + "</div>";
+    		taxonContent += "<div id=\"order\" class = \"collapse taxon\"> Order:"+ species['order']['value'] + "</div>";
+    		taxonContent += "<div id=\"family\" class = \"collapse taxon\"> Family:"+ species['family']['value'] + "</div>";
+    		taxonContent += "<div id=\"genus\" class = \"collapse taxon\"> Genus:"+ species['genus']['value'] + "</div>";
+    		taxonContent += "<div id=\"species\" class = \"collapse taxon\"> Species:"+ species['scientificName']['value'] + "</div>";
+    		
     		document.getElementById('taxondiv').innerHTML=taxonContent;
     	}
 
