@@ -230,7 +230,10 @@ public class SpeciesData {;
     }
 
     public void setName(String name) {
-        this.name = name;
+        if (null != name) {
+            this.name = name;
+            resource.addProperty(ResourceFactory.createProperty("http://dbpedia.org/property/name"), this.name);
+        }
     }
 
     public String getSynonyme() {

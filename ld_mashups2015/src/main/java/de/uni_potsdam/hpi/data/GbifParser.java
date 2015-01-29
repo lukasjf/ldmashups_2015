@@ -35,9 +35,13 @@ public class GbifParser {
         occurrence.setLatitude(""+ result.getDouble("decimalLatitude"));
         occurrence.setLongitude("" + result.getDouble("decimalLongitude"));
         occurrence.setOccurrenceID("" + result.getInt("key"));
-        occurrence.setYear(""+ result.getInt("year"));
-        occurrence.setMonth(""+ result.getInt("month"));
-        occurrence.setDay(""+ result.getInt("day"));
+        try {
+            occurrence.setYear("" + result.getInt("year"));
+            occurrence.setMonth("" + result.getInt("month"));
+            occurrence.setDay(""+ result.getInt("day"));
+        } catch (Exception e) {
+            System.err.println("The Occurrences is missing a date");
+        }
         occurrence.setGeodeticDatum(""+ result.get("geodeticDatum"));
         try {
             SpeciesData occurredSpecies = new SpeciesData(model, "http://www.gbif.org/species/" + result.getInt("speciesKey"));

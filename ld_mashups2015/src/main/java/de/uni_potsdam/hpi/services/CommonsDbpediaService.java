@@ -15,16 +15,18 @@ import de.uni_potsdam.hpi.data.SpeciesData;
 public class CommonsDbpediaService {
 
     private String sparqlEndpoint = "http://commons.dbpedia.org/sparql";
-    private String queryTemplate = "SELECT DISTINCT * "
+    private String queryTemplate = "SELECT DISTINCT ?image ?url "
             + "WHERE {"
-            + "?animal <http://dbpedia.org/ontology/wikiPageInterLanguageLink> <%s> ."
+            + "{{{?animal <http://dbpedia.org/ontology/wikiPageInterLanguageLink> <%s> .} UNION"
+            + "{?animal <http://commons.dbpedia.org/property/en> \"%s\"@en .}} UNION "
+            + "{?animal <http://www.w3.org/2000/01/rdf-schema#label> \"%s\"@en .}}"
             + "?animal <http://dbpedia.org/ontology/galleryItem> ?image ."
             + "?image <http://dbpedia.org/ontology/fileURL> ?url ."
             + "} ";
 
     public void includeDataFromCommonsDBpedia(SpeciesData species){
         List<String> imageURLs = new LinkedList<String>();
-        String sparqlQueryString = String.format(queryTemplate,species.getdBpediaURI());
+        String sparqlQueryString = String.format(queryTemplate, species.getdBpediaURI(), species.getName(), species.getShortSynonyme());
         Query query = QueryFactory.create(sparqlQueryString);
         QueryExecution qexec = QueryExecutionFactory
           .sparqlService(sparqlEndpoint, query);

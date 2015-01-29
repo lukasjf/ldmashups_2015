@@ -257,14 +257,14 @@ public class QueryEndpoint {
         String speciesQuery = "SELECT distinct ?phylum ?scientificName ?thumbnailURL ?abstract " +
                 "?kingdom ?phylum ?family ?class ?genus ?order where{ " +
                 speciesKey + " <http://rs.tdwg.org/dwc/terms/scientificName> ?scientificName . " +
-                speciesKey + "<http://dbpedia.org/ontology/abstract> ?abstract ."+
-                speciesKey + "<http://dbpedia.org/ontology/thumbnail> ?thumbnailURL ." +
-                "OPTIONAL {" + speciesKey + "<http://rs.tdwg.org/dwc/terms/kingdom> ?kingdom ." +
-                speciesKey + "<http://http://rs.tdwg.org/dwc/terms/phylum> ?phylum ." +
-                speciesKey + "<http://rs.tdwg.org/dwc/terms/family> ?family ." +
-                speciesKey + "<http://rs.tdwg.org/dwc/terms/class> ?class ." +
-                speciesKey + "<http://rs.tdwg.org/dwc/terms/genus> ?genus ." +
-                speciesKey + "<http://rs.tdwg.org/dwc/terms/order> ?order}}";
+                speciesKey + " <http://dbpedia.org/ontology/abstract> ?abstract ."+
+                speciesKey + " <http://dbpedia.org/ontology/thumbnail> ?thumbnailURL ." +
+                speciesKey + " <http://rs.tdwg.org/dwc/terms/kingdom> ?kingdom ." +
+                speciesKey + " <http://rs.tdwg.org/dwc/terms/phylum> ?phylum ." +
+                speciesKey + " <http://rs.tdwg.org/dwc/terms/family> ?family ." +
+                speciesKey + " <http://rs.tdwg.org/dwc/terms/class> ?class ." +
+                speciesKey + " <http://rs.tdwg.org/dwc/terms/genus> ?genus ." +
+                speciesKey + " <http://rs.tdwg.org/dwc/terms/order> ?order}";
         Query query = QueryFactory.create(speciesQuery);
         QueryExecution qexec = QueryExecutionFactory
                 .create(query, getModel());
