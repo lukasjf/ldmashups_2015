@@ -305,8 +305,15 @@
 					  
 					  $('div#speciesImages').empty();
 					  $.each(species['imageUrls'][0], function(i, item) {
-					   	$("<img src=\""+item['imageUrl']['value']+ "\"height=\"300\">")
+					   	$("<img src=\""+item['imageUrl']['value']+ "\" height=\"300\">")
 					   		.appendTo("div#speciesImages");
+					  });
+					  $('div#speciesVideos').empty();
+					  $.each(species['videoUrls'][0], function(i, item) {
+					   	$("<video width=\"320\" height=\"240\" controls>" +
+					   		"<source src=\""+item['videoURL']['value']+"\" type=\"video/ogg\">"+
+					  	"</video>")
+					   		.appendTo("div#speciesVideos");
 					  });
 					  addTaxonData(species);
 					  document.getElementById("mapdiv").style.width="75%";
@@ -348,6 +355,7 @@
     		<div id="abstract"></div>
     		<div id="speciesLinks"></div>
 			<div id="speciesImages"></div>
+			<div id="speciesVideos"></div>
     	</div>
     <div id="searchdiv" style="display:none; margin-top:50px" onclick="hideDiv()"></div>
     <div id="images" style="overflow-y: scroll; display: none;" onclick="hideDiv()"></div>
