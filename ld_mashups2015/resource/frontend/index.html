@@ -296,6 +296,7 @@
 					  var species = json['results']['bindings'][0];
 					  document.getElementById('scientificName').innerHTML="<h1>"+species['scientificName']['value']+"</h1>";
 					  document.getElementById('abstract').innerHTML=species['abstract']['value'];
+					  $('div#speciesLinks').empty();
 					  $.each(species['equivalentWebpages'][0], function(i, item) {
 					   	$("<a href=\""+item['equivalentWebpages']['value']+ "\">"+item['equivalentWebpages']['value']+"</a>")
 					   		.appendTo("div#speciesLinks");
