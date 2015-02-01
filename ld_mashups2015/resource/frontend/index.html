@@ -136,8 +136,8 @@
 		   geolocation.once("change:position", function() {
 				map.getView().setCenter(geolocation.getPosition());
 				var coords = ol.proj.transform(geolocation.getPosition(), view.getProjection().getCode(), 'EPSG:4326');
-				$('#longitude').val(coords[1]);
-				$('#latitude').val(coords[0]);
+				$('#longitude').val(coords[0]);
+				$('#latitude').val(coords[1]);
 		   });
 
            var accuracyFeature = new ol.Feature({name: 'You are here!'});
