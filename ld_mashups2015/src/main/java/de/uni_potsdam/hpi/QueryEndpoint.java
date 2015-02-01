@@ -198,7 +198,7 @@ public class QueryEndpoint {
 
     private boolean isSpeciesStored(RDFNode species) {
         String queryString = "ASK WHERE {"+
-                "<"+species.toString()+">" + " <http://rs.tdwg.org/dwc/terms/associatedMedia> <>}";
+                "<"+species.toString()+">" + " <http://rs.tdwg.org/dwc/terms/associatedMedia> ?a}";
         Query query = QueryFactory.create(queryString);
         QueryExecution qexec = QueryExecutionFactory
           .create(query, model);
