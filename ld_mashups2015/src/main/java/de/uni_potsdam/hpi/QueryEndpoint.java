@@ -208,7 +208,24 @@ public class QueryEndpoint {
     public String getSpeciesImages(String speciesID) {
         String speciesKey = "<" + speciesID + ">";
         String speciesQuery = "SELECT distinct ?imageUrl where{ " +
-                speciesKey + "<http://rs.tdwg.org/dwc/terms/associatedMedia> ?imageUrl}";
+                speciesKey + "<http://rs.tdwg.org/dwc/terms/associatedMedia> ?imageUrl ."+
+                "FILTER(<http://www.w3.org/2005/xpath-functions#ends-with>(STR(?imageUrl), \".JPG\"))}";
+        Query query = QueryFactory.create(speciesQuery);
+        QueryExecution qexec = QueryExecutionFactory
+                .create(query, getModel());
+        ResultSet results = qexec.execSelect();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        JSONOutput jsonOut = new JSONOutput();
+        jsonOut.format(baos, results);
+        String resultString = baos.toString();
+        return resultString;
+    }
+    
+    public String getSpeciesVideos(String speciesID) {
+        String speciesKey = "<" + speciesID + ">";
+        String speciesQuery = "SELECT distinct ?videoURL where{ " +
+                speciesKey + "<http://rs.tdwg.org/dwc/terms/associatedMedia> ?videoURL ."+
+                "FILTER(<http://www.w3.org/2005/xpath-functions#ends-with>(STR(?videoURL), \".ogg\"))}";
         Query query = QueryFactory.create(speciesQuery);
         QueryExecution qexec = QueryExecutionFactory
                 .create(query, getModel());
@@ -224,16 +241,26 @@ public class QueryEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("species")
     public String getSpeciesData(@QueryParam("species")String speciesID) {
+        try{
         JSONObject speciesInformation = new JSONObject(getSpeciesInformation(speciesID));
         JSONObject speciesImages = new JSONObject(getSpeciesImages(speciesID));
+        JSONObject speciesVideos = new JSONObject(getSpeciesVideos(speciesID));
         JSONObject speciesUrls = new JSONObject(getSpeciesUrls(speciesID));
         speciesInformation.getJSONObject("head").getJSONArray("vars").put("imageUrls");
+        speciesInformation.getJSONObject("head").getJSONArray("vars").put("videoUrls");
         speciesInformation.getJSONObject("head").getJSONArray("vars").put("equivalentWebpages");
         JSONArray imageURLs = speciesImages.getJSONObject("results").getJSONArray("bindings");
+        JSONArray videoURLs = speciesVideos.getJSONObject("results").getJSONArray("bindings");
         JSONArray equivalentWebpages = speciesUrls.getJSONObject("results").getJSONArray("bindings");
         speciesInformation.getJSONObject("results").getJSONArray("bindings").getJSONObject(0).append("imageUrls", imageURLs);
+        speciesInformation.getJSONObject("results").getJSONArray("bindings").getJSONObject(0).append("videoUrls", videoURLs);
         speciesInformation.getJSONObject("results").getJSONArray("bindings").getJSONObject(0).append("equivalentWebpages", equivalentWebpages);
         return speciesInformation.toString();
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            return"";
+        }
     }
 
     public String getSpeciesUrls(String speciesID) {
