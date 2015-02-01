@@ -109,7 +109,7 @@
 
            var view = new ol.View({
                center: [0, 0],
-               zoom: 2
+               zoom: 10
            });
 
            var geolocation = new ol.Geolocation({
@@ -132,6 +132,8 @@
                view: view
            });
            map.addControl(new ol.control.ZoomSlider());
+		   
+		   geolocation.once("change:position", function() { map.getView().setCenter(geolocation.getPosition()); });
 
            var accuracyFeature = new ol.Feature({name: 'You are here!'});
            accuracyFeature.bindTo('geometry', geolocation, 'accuracyGeometry');
