@@ -303,7 +303,7 @@
 					  var species = json['results']['bindings'][0];
 					  document.getElementById('scientificName').innerHTML="<h1>"+species['scientificName']['value']+"</h1>";
 					  document.getElementById('abstract').innerHTML=species['abstract']['value'];
-					  document.getElementById('thumbnail').setAttribute("src",species['thumbnailURL']['value']);
+					  //document.getElementById('thumbnail').setAttribute("src",species['thumbnailURL']['value']);
 					  $('div#speciesLinks').empty();
 					  $.each(species['equivalentWebpages'][0], function(i, item) {
 					   	$("<a href=\""+item['equivalentWebpages']['value']+ "\">"+item['equivalentWebpages']['value']+"</a>")
@@ -359,17 +359,9 @@
 	    </div>    
     	<div id="speciesdiv">
     		<div id="taxondiv">
-			    <div id="kingdom" class="collapse taxon"></div>
-			    <div id="phylum" class="collapse taxon"></div>
-			    <div id="class" class="collapse taxon"></div>
-			    <div id="order" class="collapse taxon"></div>
-			    <div id="family" class="collapse taxon"></div>
-			    <div id="genus" class="collapse taxon"></div>
-			    <div id="species" class="collapse taxon"></div>
     		</div>
     	    <div id="scientificName"></div>	
     		<div id="abstract"></div>
-    		<img id="thumbnail" src="">
     		<div id="speciesLinks"></div>
 			<div id="speciesImages"></div>
 			<div id="speciesVideos"></div>
