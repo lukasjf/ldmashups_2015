@@ -41,7 +41,7 @@ public class LinkService {
     }
 
     private void addBBCLinkIfExists(List<String> links, SpeciesData species) {
-        String uri = "http://bbc.co.uk/nature/life/" + species.getName().replace(" ", "_");
+        String uri = "http://bbc.co.uk/nature/life/" + species.getName().replace(" ", "_").replace("@en", "");
         URL url;
         try {
             url = new URL(uri);
