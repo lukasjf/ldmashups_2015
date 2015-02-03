@@ -52,17 +52,23 @@
             top: 232px;
         }
     </style>
+    <script src="http://openlayers.org/en/master/resources/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
     <link rel="stylesheet" type="text/css" href="index.css">
-    </head>
+	<script src="js/jquery-1.9.1.min.js"></script>
+	<script src="js/jssor.js"></script>
+	<script src="js/jssor.slider.js"></script>
+	<script>
+	    
+	</script>
 </head>
 <body onload="loadMap()">
-    <script src="http://openlayers.org/en/master/resources/jquery.min.js"></script>
     <script src="lib/jquery.form.min.js"></script>
     <script src="http://openlayers.org/en/v3.0.0/build/ol.js"></script>
     <!-- Latest compiled and minified JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+
     <script src="http://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.3/fastclick.js"></script>
     <script language="JavaScript" type="text/javascript">
         var map;
@@ -100,8 +106,7 @@
             }
         }
 
-       function loadMap() {
-
+       function loadMap() {   	   
            var rasterLayer =
                    new ol.layer.Tile({
                        source: new ol.source.OSM()
@@ -303,19 +308,26 @@
 					  var species = json['results']['bindings'][0];
 					  document.getElementById('scientificName').innerHTML="<h1>"+species['scientificName']['value']+"</h1>";
 					  document.getElementById('abstract').innerHTML=species['abstract']['value'];
-					  //document.getElementById('thumbnail').setAttribute("src",species['thumbnailURL']['value']);
+					  
 					  $('div#speciesLinks').empty();
 					  $.each(species['equivalentWebpages'][0], function(i, item) {
 					   	$("<a href=\""+item['equivalentWebpages']['value']+ "\">"+item['equivalentWebpages']['value']+"</a>")
 					   		.appendTo("div#speciesLinks");
 					   	$("<br></br>").appendTo("div#speciesLinks");
 					  });
+					  $("")
 					  
-					  $('div#speciesImages').empty();
+					  $('#slider1_container').remove();
+					  $('<div id="slider1_container" style="position: relative; top: 0px; left: 0px; width: 600px; height: 300px;"><div id="speciesImages" u="slides" style="cursor: move; position: absolute; overflow: hidden; left: 0px; top: 0px; width: 600px; height: 300px;"></div></div>').appendTo('#speciesdiv');
 					  $.each(species['imageUrls'][0], function(i, item) {
-					   	$("<img src=\""+item['imageUrl']['value']+ "\" height=\"300\">")
-					   		.appendTo("div#speciesImages");
+					   	$("<div><img class=\"speciesImage\" src=\""+item['imageUrl']['value']+ "\"></div>").appendTo("div#speciesImages")
 					  });
+					  
+			    	   jQuery(document).ready(function ($) {
+			      	        var options = { $AutoPlay: true };
+			      	        var jssor_slider1 = new $JssorSlider$('slider1_container', options);
+			      	   });
+					  
 					  $('div#speciesVideos').empty();
 					  $.each(species['videoUrls'][0], function(i, item) {
 					   	$("<video width=\"320\" height=\"240\" controls>" +
@@ -324,8 +336,8 @@
 					   		.appendTo("div#speciesVideos");
 					  });
 					  addTaxonData(species);
-					  document.getElementById("mapdiv").style.width="75%";
-					  document.getElementById("speciesdiv").style.width="25%";
+					  $("#map").attr("class","col-md-8 col-xs-12");
+					  $("#species").attr("class","col-md-4 col-xs-12");
     		       }
     		})
     	}
@@ -344,29 +356,37 @@
     	}
 
     </script>
-    <div id="title" style="display:flex;">
-        <h3>Taxon-Finder</h3>
-        <form id="searchform" style="position:absolute; top:15px; right:5px">
+    
+<div id="container" class='container-fluid'>
+	<div class='row'>
+		<h3>Taxon-Finder</h3>
+	</div>
+	<div class='row'>
+		<form id="searchform">
             <label for="longitude">longitude:</label><input name="longitude" type="text" value="13.133317" id="longitude" style="border-radius:10px; -moz-border-radius:10px; -webkit-border-radius:10px;"/>
             <label for="latitude">latitude:</label><input name="latitude" type="text" value="52.394050" id="latitude" style="border-radius:10px; -moz-border-radius:10px; -webkit-border-radius:10px;"/>
             <button class="btn btn-info" type="submit"><i class="glyphicon glyphicon-search"></i></button>
         </form>
-    </div>
-    <div id="container">
-	    <div id="mapdiv">
-	        <div id="popup"></div>
-	    </div>    
-    	<div id="speciesdiv">
-    		<div id="taxondiv">
-    		</div>
-    	    <div id="scientificName"></div>	
-    		<div id="abstract"></div>
-    		<div id="speciesLinks"></div>
-			<div id="speciesImages"></div>
-			<div id="speciesVideos"></div>
-    	</div>
-    <div id="searchdiv" style="display:none; margin-top:50px" onclick="hideDiv()"></div>
-    <div id="images" style="overflow-y: scroll; display: none;" onclick="hideDiv()"></div>
-    </div>
+	</div>
+	<div class='row'>
+		<div id="map" class='col-md-12 col-xs-12'>     
+		    <div id="mapdiv">
+		    </div>
+	    </div>
+	    <div id="species" class='col-md-0 col-xs-0'>
+		   	<div id="speciesdiv">
+		   		<div id="taxondiv"></div>
+		   	    <div id="scientificName"></div>	
+		   		<div id="abstract"></div>
+		   		<div id="speciesLinks"></div>
+		   		<div id="speciesVideos"></div>
+		   	</div>
+	   	</div>        
+   	</div>
+	<div class='row'>
+		<div id="searchdiv" style="display:none; margin-top:50px" onclick="hideDiv()"></div>
+		<div id="images" style="display:none; margin-top:50px; overflow-y:scroll" onclick="hideDiv()"></div>
+	</div>
+</div>
 </body>
 </html>
