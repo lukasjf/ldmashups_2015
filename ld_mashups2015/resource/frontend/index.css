@@ -7,9 +7,14 @@
 
 #speciesdiv {
 	float: right;
+	
+}
+
+#speciesImages{
+	border-style: solid;
+    border-width: medium;
 }
 
 .speciesImage {
-	float: left;
-	width: 100%;
+    height: 100%;
 }
