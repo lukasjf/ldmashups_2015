@@ -40,12 +40,13 @@ public class GbifService {
             }
             URL url = null;
             try {
-                url = new URL(occurenceApiString + "search?decimalLongitude=" + longitude1+ "," + longitude2 + 
+                url = new URL(occurenceApiString + "search?decimalLongitude=" + longitude1+ "," + longitude2 +
                         "&" + "decimalLatitude=" + latitude1 + "," + latitude2);
                 HttpURLConnection occurrenceClient = (HttpURLConnection)url.openConnection();
                 occurrenceClient.setRequestMethod("GET");
                 JSONObject response = getResponse(occurrenceClient);
                 JSONArray occurrences = response.getJSONArray("results");
+
                 return occurrences;
             }
             catch(Exception e){

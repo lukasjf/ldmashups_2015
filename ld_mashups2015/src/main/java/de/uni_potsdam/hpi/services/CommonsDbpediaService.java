@@ -20,7 +20,7 @@ public class CommonsDbpediaService {
             + "{{{?animal <http://dbpedia.org/ontology/wikiPageInterLanguageLink> <%s> .} UNION"
             + "{?animal <http://commons.dbpedia.org/property/en> \"%s\"@en .}} UNION "
             + "{?animal <http://www.w3.org/2000/01/rdf-schema#label> \"%s\"@en .}}"
-            + "?animal <http://dbpedia.org/ontology/galleryItem> ?image ."
+            + "?image <http://dbpedia.org/ontology/wikiPageWikiLink> ?animal ."
             + "?image <http://dbpedia.org/ontology/fileURL> ?url ."
             + "} ";
 
