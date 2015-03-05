@@ -12,8 +12,8 @@ function getSpeciesInfo(speciesID){
 
 function processSpeciesData(speciesJSON){
 	  var species = speciesJSON['results']['bindings'][0];
-	  $('<h1>'+species['scientificName']['value']+'</h1>').appendTo('#scientificName');
-	  $('#abstract').append(species['abstract']['value']);
+	  $('#scientificName').empty().append('<h1>'+species['scientificName']['value']+'</h1>');
+	  $('#abstract').empty().append(species['abstract']['value']);
 	  
 	  addLinksToSpecies(species);
 	  addImagesToSpecies(species);
@@ -55,6 +55,7 @@ function addMediaToSpecies(species){
     	
 function addTaxonomyToSpecies(species){
 	$('#taxondiv')
+		.empty()
 		.append('<button type="button" class="btn btn-info" data-toggle="collapse" data-target=".taxon">Taxonomy</button>')
 		.append('<a id="kingdom" class = "collapse taxon" target="_blank" href="'+species['kingdom']['value']+'">Kingdom</a>')
 		.append('<a id="phylum" class = "collapse taxon" target="_blank" href="'+species['phylum']['value']+'">Phylum</a>')
