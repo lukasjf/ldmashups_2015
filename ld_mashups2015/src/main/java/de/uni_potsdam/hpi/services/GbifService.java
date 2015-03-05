@@ -17,10 +17,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * @author Stephan
- * @version 14/11/11
+ * This class allows to access the information from te GBIF.
+ * It will use a given geolocation to run a querry.
+ * It will check weather of not the occurrence is written to the cache and load the data from it eventually.
  */
 public class GbifService {
+    public static long time = 0;
+    public static int count = 0;
     /** URL (String) to the occurrence API of the gbif */
     String occurenceApiString = "http://api.gbif.org/v1/occurrence/";
 
@@ -34,6 +37,7 @@ public class GbifService {
     
     public JSONArray getOccurrenceForRange
         (double latitude1, double latitude2, double longitude1, double longitude2){
+        long startime = System.currentTimeMillis();
             if (!locationIsValid(latitude1, latitude2, longitude1, longitude2)) {
                 System.err.println("Invalid Location");
                 return null;
@@ -45,6 +49,8 @@ public class GbifService {
                 HttpURLConnection occurrenceClient = (HttpURLConnection)url.openConnection();
                 occurrenceClient.setRequestMethod("GET");
                 JSONObject response = getResponse(occurrenceClient);
+                time += System.currentTimeMillis() - startime;
+                System.out.println("GBIF: " + time + " count:" + ++count);
                 JSONArray occurrences = response.getJSONArray("results");
 
                 return occurrences;

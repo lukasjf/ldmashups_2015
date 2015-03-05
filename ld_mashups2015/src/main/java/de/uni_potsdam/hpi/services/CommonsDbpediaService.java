@@ -12,8 +12,12 @@ import com.hp.hpl.jena.query.ResultSet;
 
 import de.uni_potsdam.hpi.data.SpeciesData;
 
+/**
+ * This class accesses the Dbpedia commons via the SPARQL-Endpoint.
+ * Create a instance of this class and execute the includeDataFromCommonsDBpedia on an existing SpeciesData-Object.
+ * The species will be updated with the information retrieved from the DBpedia-Commons.
+ */
 public class CommonsDbpediaService {
-
     private String sparqlEndpoint = "http://commons.dbpedia.org/sparql";
     private String queryTemplate = "SELECT DISTINCT ?image ?url "
             + "WHERE {"

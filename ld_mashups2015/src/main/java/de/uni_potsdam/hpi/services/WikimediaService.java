@@ -14,6 +14,11 @@ import org.json.JSONObject;
 
 import de.uni_potsdam.hpi.data.SpeciesData;
 
+/**
+ * This class was used to retrieve MediaInformation from the wikimedia.
+ * It is recommended to use the CommonsDbpediaService instead.
+ */
+@Deprecated
 public class WikimediaService {
     static String imageListString = 
             "http://commons.wikimedia.org/w/api.php?action=query&titles=%s&prop=images&continue=&format=json";

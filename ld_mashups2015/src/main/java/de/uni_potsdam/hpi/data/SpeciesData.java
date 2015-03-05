@@ -6,7 +6,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Holds all the information about a species
+ * Holds all the information about a species.
+ * These information can be accessed using the getter Methods.
+ * They can also be written to the database.
  *
  * @author Stephan
  * @version 11/11/14
@@ -246,7 +248,6 @@ public class SpeciesData {;
             resource.addProperty(ResourceFactory.createProperty("http://dbpedia.org/property/synonyms"), this.synonyme);
         }
     }
-    
     /* END: Getter and Setter */
 
     public String getShortSynonyme() {

@@ -6,6 +6,11 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
+/**
+ * This class is a data class which allows to save data belonging to an occurrence.
+ * This class serves the functionality to save the information to an JENA-Model.
+ * There are getters to access these values.
+ */
 public class OccurrenceData {
     public static final String FILE_URL = "resource/rdf/occurrence.rdf";
     private String latitude;

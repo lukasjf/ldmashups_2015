@@ -1,7 +1,3 @@
-/**
- * 
- */
-
 var map;
 var lastSearchResults;
 var SEARCH_AJAX_FORM = {
@@ -76,104 +72,104 @@ function getRendererFromQueryString() {
     }
 }
 
-       function loadMap() {   	   
-           var rasterLayer =
-                   new ol.layer.Tile({
-                       source: new ol.source.OSM()
-                   });
-
-           var view = new ol.View({
-               center: [0, 0],
-               zoom: 10
-           });
-
-           var geolocation = new ol.Geolocation({
-               projection: view.getProjection(),
-               tracking: true
-           });
-
-           map = new ol.Map({
-               controls: ol.control.defaults({
-                   attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
-                       collapsible: false
-                   }),
-                   zoomOptions: /** */ ({
-                       zoomInTipLabel: '',
-                       zoomOutTipLabel: ''
-                   })
-               }),
-               layers: [rasterLayer],
-               target: document.getElementById('mapdiv'),
-               view: view
-           });
-           map.addControl(new ol.control.ZoomSlider());
-		   
-		   geolocation.once("change:position", function() {
-				map.getView().setCenter(geolocation.getPosition());
-				var coords = ol.proj.transform(geolocation.getPosition(), view.getProjection().getCode(), 'EPSG:4326');
-				$('#longitude').val(coords[0]);
-				$('#latitude').val(coords[1]);
+function loadMap() {   	   
+   var rasterLayer =
+		   new ol.layer.Tile({
+			   source: new ol.source.OSM()
 		   });
 
-           var accuracyFeature = new ol.Feature({name: 'You are here!'});
-           accuracyFeature.bindTo('geometry', geolocation, 'accuracyGeometry');
+   var view = new ol.View({
+	   center: [0, 0],
+	   zoom: 10
+   });
 
-           var positionFeature = new ol.Feature({name: 'You are here!'});
-           positionFeature.bindTo('geometry', geolocation, 'position')
-                   .transform(function() {}, function(coordinates) {
-                       return coordinates ? new ol.geom.Point(coordinates) : null;
-                   });
+   var geolocation = new ol.Geolocation({
+	   projection: view.getProjection(),
+	   tracking: true
+   });
 
-           var featuresOverlay = new ol.FeatureOverlay({
-               map: map,
-               features: [accuracyFeature, positionFeature]
-           });
+   map = new ol.Map({
+	   controls: ol.control.defaults({
+		   attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
+			   collapsible: false
+		   }),
+		   zoomOptions: /** */ ({
+			   zoomInTipLabel: '',
+			   zoomOutTipLabel: ''
+		   })
+	   }),
+	   layers: [rasterLayer],
+	   target: document.getElementById('mapdiv'),
+	   view: view
+   });
+   map.addControl(new ol.control.ZoomSlider());
+   
+   geolocation.once("change:position", function() {
+		map.getView().setCenter(geolocation.getPosition());
+		var coords = ol.proj.transform(geolocation.getPosition(), view.getProjection().getCode(), 'EPSG:4326');
+		$('#longitude').val(coords[0]);
+		$('#latitude').val(coords[1]);
+   });
 
-           var element = document.getElementById('popup');
+   var accuracyFeature = new ol.Feature({name: 'You are here!'});
+   accuracyFeature.bindTo('geometry', geolocation, 'accuracyGeometry');
 
-           var popup = new ol.Overlay({
-               element: element,
-               positioning: 'bottom-center',
-               stopEvent: false
-           });
+   var positionFeature = new ol.Feature({name: 'You are here!'});
+   positionFeature.bindTo('geometry', geolocation, 'position')
+		   .transform(function() {}, function(coordinates) {
+			   return coordinates ? new ol.geom.Point(coordinates) : null;
+		   });
 
-           // display popup on click
-           map.on('click', function(evt) {
-               var feature = map.forEachFeatureAtPixel(evt.pixel,
-                       function(feature, layer) {
-                           return feature;
-                       });
-               if (feature) {
-                   var images = "";
-                   for (var i = 0; i < feature.get('data')['occurrenceInfo'].length; i++) {
-                       var occ = feature.get('data')['occurrenceInfo'][i];
-                       var species = occ['species'];
-                       images = images + "<table style='float:left;width:300px'><tr><td></td>";
-                       images = images + '<td rowspan=2><a href="#" onClick="getSpeciesInfo(\''+species+'\')">' +
-                       '<img src="' + occ['thumbnailURL']  + '"/></a></td></tr><tr><td colspan=2 valign="bottom">' +
-                            occ['binomial'] + '</td></tr></table>'
-                   }
-                   images = images;
-                   var imagesElement = document.getElementById('images');
-                   imagesElement.style.display = "";
-                   imagesElement.innerHTML = images;
-               }
-           });
-           map.addOverlay(popup);
+   var featuresOverlay = new ol.FeatureOverlay({
+	   map: map,
+	   features: [accuracyFeature, positionFeature]
+   });
 
-            // change mouse cursor when over marker
-           $(map.getViewport()).on('mousemove', function(e) {
-               var pixel = map.getEventPixel(e.originalEvent);
-               var hit = map.forEachFeatureAtPixel(pixel, function(feature, layer) {
-                   return true;
-               });
-               if (hit) {
-                   map.getTarget().style.cursor = 'pointer';
-               } else {
-                   map.getTarget().style.cursor = '';
-               }
-           });
-       }
+   var element = document.getElementById('popup');
+
+   var popup = new ol.Overlay({
+	   element: element,
+	   positioning: 'bottom-center',
+	   stopEvent: false
+   });
+
+   // display popup on click
+   map.on('click', function(evt) {
+	   var feature = map.forEachFeatureAtPixel(evt.pixel,
+			   function(feature, layer) {
+				   return feature;
+			   });
+	   if (feature) {
+		   var images = "";
+		   for (var i = 0; i < feature.get('data')['occurrenceInfo'].length; i++) {
+			   var occ = feature.get('data')['occurrenceInfo'][i];
+			   var species = occ['species'];
+			   images = images + "<table style='float:left;width:300px'><tr><td></td>";
+			   images = images + '<td rowspan=2><a href="#" onClick="getSpeciesInfo(\''+species+'\')">' +
+			   '<img src="' + occ['thumbnailURL']  + '"/></a></td></tr><tr><td colspan=2 valign="bottom">' +
+					occ['binomial'] + '</td></tr></table>'
+		   }
+		   images = images;
+		   var imagesElement = document.getElementById('images');
+		   imagesElement.style.display = "";
+		   imagesElement.innerHTML = images;
+	   }
+   });
+   map.addOverlay(popup);
+
+	// change mouse cursor when over marker
+   $(map.getViewport()).on('mousemove', function(e) {
+	   var pixel = map.getEventPixel(e.originalEvent);
+	   var hit = map.forEachFeatureAtPixel(pixel, function(feature, layer) {
+		   return true;
+	   });
+	   if (hit) {
+		   map.getTarget().style.cursor = 'pointer';
+	   } else {
+		   map.getTarget().style.cursor = '';
+	   }
+   });
+}
        
        
 
@@ -222,7 +218,6 @@ function addFeaturesFor(data) {
     var vectorLayer = new ol.layer.Vector({source: vectorSource});
     map.addLayer(vectorLayer);
 }
-
 
 
 $(document).ready(function() {

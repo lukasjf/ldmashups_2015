@@ -9,6 +9,8 @@ import java.util.List;
 
 /**
  * This class checks for different Webresources and adds the link to the species.
+ * Therefore it used different search APIs or makes an intelligent guess for the url.
+ * If the generated Link is available it will be added to a given species.
  */
 public class LinkService {
 

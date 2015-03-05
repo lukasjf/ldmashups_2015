@@ -9,6 +9,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.ext.RuntimeDelegate;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,13 +18,33 @@ import java.util.HashMap;
 
 public class Main {
 
-    //public static final URI BASE_URI = UriBuilder.fromUri("http://localhost/").port(9998).build();
+    /**
+     * The Base URI of the server, it contains the port.
+     */
     public static final String BASE_URI = "http://localhost:9998";
+    /**
+     * The root folder of the web resources
+     */
     public static final String WEB_ROOT = "resource/frontend";
+    /**
+     * The path which leads to the frontend
+     */
     public static final String APP_PATH = "/taxon-finder";
+    /**
+     * The path which leads to the frontend-api
+     */
     public static final String API_PATH = "/api";
+    /**
+     * The port of teh server
+     */
     public static final int PORT = 9998;
 
+    /**
+     * This Methods creates an HTTP server and starts it.
+     * The Server will be available at the given PORT.
+     * @return the created HTTP-Server
+     * @throws IOException
+     */
     protected static HttpServer startServer() throws IOException {
         final HttpServer server = new HttpServer();
         final NetworkListener listener = new NetworkListener("grizzly", "localhost", PORT);
@@ -72,6 +93,9 @@ public class Main {
     private static class StaticContentHandler extends HttpHandler {
         private static final HashMap<String, String> EXTENSION_TO_MEDIA_TYPE;
 
+        /*
+         * Supported media types
+         */
         static {
             EXTENSION_TO_MEDIA_TYPE = new HashMap<String, String>();
 
@@ -115,7 +139,6 @@ public class Main {
 
             try {
                 fileStream = webRootPath == null ?
-                        //Main.class.getResourceAsStream(WEB_ROOT + uri) :
                         new FileInputStream(WEB_ROOT + uri) :
                         new FileInputStream(webRootPath + uri);
             } catch (IOException e) {

@@ -35,7 +35,11 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 
 
-// The Java class will be hosted at the URI path "/occurrence"
+/**
+ * This class provides a Rest-Interface for the Taxon-Finder.
+ * There are to api-functions one for accessing occurrence data and one for accessing species data.
+ * This api calls are used by the frontend.
+ */
 @Path("/")
 public class QueryEndpoint {
     

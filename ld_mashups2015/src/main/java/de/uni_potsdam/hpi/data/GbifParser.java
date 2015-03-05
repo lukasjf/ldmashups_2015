@@ -9,6 +9,11 @@ import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 
+/**
+ * This class parses the results from the GBIF.
+ * It receives an JSONArray which contains the result of the GBIF-Querry and saves it to a Jena Model.
+ * Therefore the data from the JSON Array will be saved to an Object of the OccurrenceData.
+ */
 public class GbifParser {
     public void parseData(JSONArray results, Model model){
         for(int i = 0; i < results.length(); i++){

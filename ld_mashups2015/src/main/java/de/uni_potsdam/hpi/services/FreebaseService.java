@@ -14,6 +14,12 @@ import java.net.URLEncoder;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * This class was used to access the Freebase.
+ * It allows to retrieve MediaData and alternative Webresources for a given species.
+ * Therefore the binomial of the species is needed.
+ */
+@Deprecated
 public class FreebaseService {
     private static final String MQL_API = "https://www.googleapis.com/freebase/v1/mqlread?query=";
     private static final String TOPIC_API = "https://www.googleapis.com/freebase/v1/topic%s?filter=/common/topic/";

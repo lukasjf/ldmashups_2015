@@ -9,8 +9,12 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Resource;
 import de.uni_potsdam.hpi.data.SpeciesData;
 
+/**
+ * The DBpediaService contains the functionality to retrieve Species information from the DBpedia.
+ * The DBpedia will accessed via its SPARQL enpoint. The data will then be included in an existing species Object.
+ * This species Object mus include the binomial to execute the sparql-Query.
+ */
 public class DBpediaService {
-
     private String sparqlEndpoint = "http://dbpedia.org/sparql";
     private String queryTemplate = "SELECT ?name ?image ?binomial ?abstract ?kingdom ?phylum ?family ?animal ?class ?order ?genus ?english_name " +
             "FROM <http://dbpedia.org> " +
@@ -33,7 +37,7 @@ public class DBpediaService {
 
     // searching for strings does not work yet, nor does it in the online endpoint
 	public void includeDataFromDBpedia(SpeciesData species){
-	String sparqlQueryString = String.format(queryTemplate, species.getBinomial(), species.getBinomial());
+	    String sparqlQueryString = String.format(queryTemplate, species.getBinomial(), species.getBinomial());
         Query query = QueryFactory.create(sparqlQueryString);
         QueryExecution qexec = QueryExecutionFactory
           .sparqlService(sparqlEndpoint, query);
